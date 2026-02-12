@@ -1,0 +1,61 @@
+/* Modal Overlay */
+/* Modal Overlay */
+/* Modal Overlay */
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.3); /* Semi-transparent background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10; /* Ensure it's above all other content */
+}
+
+/* Modal Content */
+.modalContent {
+  background: black;
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 60%;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.modalTop {
+  position: relative;
+}
+/* Close Icon */
+.closeModalIcon {
+  position: absolute;
+  top: -2rem;
+  right: -10px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  width: 2rem;
+}
+
+.closeModalIcon:hover {
+  color: var(--med-text-color);
+}
+.modalBottom {
+  display: flex;
+  justify-content: center;
+  gap: 5rem;
+}
+
+.btnYes {
+  background-color: var(--highlight-red);
+  color: white;
+  font-size: large;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  border-width: 0;
+  cursor: pointer;
+}

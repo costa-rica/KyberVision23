@@ -1,0 +1,66 @@
+.main {
+  display: flex;
+  flex-direction: column;
+  /* justify-content: center; */
+  align-items: center;
+  min-height: 100vh;
+  padding: 4rem 0;
+  /* background-color: rgba(0, 0, 0, 0); */
+  /* background-color: green; */
+}
+
+.divSuperInput {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.tableVideos {
+  border: 0.1rem solid black;
+  border-radius: 12px;
+  padding: 1rem;
+}
+.tableVideos th {
+  /* background-color: plum; */
+  border-bottom: 0.2rem solid rgba(0, 0, 0, 0.6);
+}
+
+.tableVideos td {
+  word-wrap: break-word; /* Ensure long words or URLs wrap */
+  overflow-wrap: break-word; /* Ensure wrapping in modern browsers */
+  word-break: break-all; /* Break words at arbitrary points for extremely long text */
+  hyphens: auto; /* Adds hyphenation when possible */
+  padding: 0.25rem;
+}
+.tdFilename {
+  padding: 0.8rem;
+}
+.tdRemove {
+  /* background-color: purple; */
+  height: 100%; /* Take full height of the row */
+  vertical-align: middle; /* Align content vertically */
+  text-align: center; /* Center horizontally */
+  display: table-cell; /* Ensure it behaves like a standard table cell */
+}
+.divTdRemove {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* background-color: green; */
+}
+.btnRemove {
+  background-color: transparent;
+  /* background-color: blue; */
+  border: none;
+  display: flex;
+  justify-content: center;
+}
+.iconDelete {
+  color: rgba(200, 70, 50, 100);
+  font-size: x-large;
+}
+
+.divTdVideoId {
+  font-size: small;
+  color: rgba(50, 50, 50, 0.6);
+}

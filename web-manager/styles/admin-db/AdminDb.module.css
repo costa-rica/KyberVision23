@@ -1,0 +1,159 @@
+.main {
+  display: flex;
+  flex-direction: column;
+  /* justify-content: center; */
+  align-items: center;
+  min-height: 100vh;
+  padding: 4rem 0;
+}
+
+.divMain {
+  width: 80vw;
+}
+
+.divLinks {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.divDropdown {
+  display: flex;
+  justify-content: center;
+}
+.dropdownContainer {
+  margin-bottom: 20px;
+}
+
+.dropdown {
+  padding: 8px;
+  font-size: 16px;
+}
+
+.tableContainer {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.table {
+  border-collapse: collapse;
+  width: 80%;
+}
+
+.table th,
+.table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.table th {
+  background-color: #f4f4f4;
+}
+
+.liBackups {
+  padding: 0.25rem;
+}
+.btnDownload {
+  background: none;
+  border: none;
+  color: blue;
+  cursor: pointer;
+  font-size: 16px;
+  text-decoration: underline;
+  padding: 0;
+}
+
+.btnDownload:hover {
+  color: darkblue;
+}
+.btnDelete {
+  background-color: red;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-left: 1rem;
+}
+
+.form {
+  width: 100%;
+  max-width: 500px;
+}
+
+.divInputGroup {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.divInputGroup label {
+  /* width: 150px; */
+  font-weight: bold;
+  text-align: right;
+  padding-right: 10px;
+}
+
+.inputField {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.submitButton {
+  width: 100%;
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.submitButton:hover {
+  background-color: #0056b3;
+}
+
+/* Modal: ManageDbUploads */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modalContent {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.progressBar {
+  width: 100%;
+  background: #ddd;
+  border-radius: 5px;
+  margin-top: 10px;
+}
+
+.progressFill {
+  height: 10px;
+  background: #4caf50;
+  border-radius: 5px;
+}
+
+.btnCancel {
+  background-color: grey;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-left: 1rem;
+}

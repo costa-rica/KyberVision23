@@ -1,0 +1,38 @@
+{
+  "name": "kybervision23db",
+  "version": "20.0.0",
+  "description": "Kyber Vision DB models (Sequelize, SQLite) with TypeScript typings",
+  "type": "commonjs",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "rimraf dist",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "sequelize": "^6.37.7",
+    "sqlite3": "^5.1.7"
+  },
+  "overrides": {
+    "tar": "^7.5.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.4",
+    "rimraf": "^6.0.1",
+    "ts-node": "^1.7.1",
+    "typescript": "^5.9.2"
+  }
+}

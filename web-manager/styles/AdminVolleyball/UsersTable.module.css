@@ -1,0 +1,75 @@
+.main {
+  /* max-width: 800px; */
+  margin: auto;
+  padding: 20px;
+}
+
+.mainTop {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.formContainer {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.form {
+  width: 100%;
+  max-width: 800px;
+}
+
+.inputGroup {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  word-wrap: break-word; /* Ensure long words or URLs wrap */
+}
+
+.inputGroup label {
+  width: 250px;
+  font-weight: bold;
+  text-align: right;
+  padding-right: 10px;
+}
+
+.inputField {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.submitButton {
+  width: 100%;
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.submitButton:hover {
+  background-color: #0056b3;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+}
+
+.deleteButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: red;
+}

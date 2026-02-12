@@ -1,0 +1,178 @@
+.main {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+.divMain {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+.divTop {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  flex-wrap: wrap;
+  /* background-color: gray; */
+}
+.divTop h1 {
+  width: 100%;
+}
+.divLinks {
+  width: 80%;
+}
+.divDropdown {
+  display: flex;
+  justify-content: center;
+}
+.dropdownContainer {
+  margin-bottom: 20px;
+}
+
+.dropdown {
+  padding: 8px;
+  font-size: 16px;
+}
+.divControls {
+  display: flex;
+  flex-direction: row;
+  /* justify-content: center; */
+  align-items: center;
+  width: 80%;
+  /* background-color: gray; */
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  border: 0.2rem solid gray;
+}
+.divHideColumns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-left: 1rem;
+}
+
+/* 
+---- divMiddle ----
+*/
+
+.divMiddle {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.divAddOrUpdateGroup {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 80%;
+  border: 0.2rem solid gray;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+}
+.divAddOrUpdateGroupItem {
+  display: flex;
+  flex-direction: row;
+  align-items: center; /* ⬅️ Key fix: aligns input to the top of the p */
+  justify-content: space-between;
+  width: 30rem;
+  padding: 0.5rem 1rem;
+  margin: 0.5rem;
+  border: 0.1rem solid black;
+  border-radius: 0.25rem;
+}
+.divAddOrUpdateGroupItem input {
+  width: 100%;
+  height: auto;
+  padding: 4px 8px;
+  font-size: 1rem;
+  box-sizing: border-box;
+  align-self: center; /* ⬅️ Prevents it from stretching */
+}
+.divAddOrUpdateGroupItem p {
+  margin: 0;
+  width: 10rem;
+  word-wrap: break-word; /* Ensure long words or URLs wrap */
+  overflow-wrap: break-word; /* Ensure wrapping in modern browsers */
+  word-break: break-all; /* Break words at arbitrary points for extremely long text */
+  hyphens: auto; /* Adds hyphenation when possible */
+}
+
+.divRadioGroup {
+  display: flex;
+  flex-direction: row;
+  gap: 3rem;
+  align-items: center;
+}
+
+.labelRadioOption {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.divAddOrUpdateGroupItemSubmit {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding-inline: 5rem;
+}
+.divAddOrUpdateGroupItemSubmit button {
+  width: 10rem;
+  padding: 1rem;
+  border-radius: 0.25rem;
+  /* color: white; */
+  /* background-color:; */
+}
+/* 
+---- divBottom ----
+*/
+
+.divBottom {
+  display: flex;
+  justify-content: center;
+}
+
+/* Select Button */
+.selectButton {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.selectButton:hover {
+  background-color: #0056b3;
+}
+
+.divTableCell {
+  word-wrap: break-word; /* Ensure long words or URLs wrap */
+  overflow-wrap: break-word; /* Ensure wrapping in modern browsers */
+  word-break: break-all; /* Break words at arbitrary points for extremely long text */
+  hyphens: auto; /* Adds hyphenation when possible */
+  text-align: center;
+}
+.divDeleteButton {
+  display: flex;
+  justify-content: center;
+  /* width: 1rem; */
+}
+/* Delete Button */
+.deleteButton {
+  background-color: red;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.deleteButton:hover {
+  background-color: darkred;
+}

@@ -1,0 +1,166 @@
+.divTemplateViewScreen {
+  padding: 0;
+  margin: 0;
+}
+.headerCustom {
+  background-color: var(--bg-navbar-top);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 2;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  height: var(--height-header);
+}
+.headerCustomNonProduction {
+  background-color: orange;
+}
+.divTemplateViewMain {
+  display: flex;
+  flex-direction: row;
+  margin-top: var(--height-header);
+  min-height: var(--height-content-main);
+}
+.divHeaderLeft {
+  padding: 0.5rem;
+}
+.imgLogo {
+  width: 3rem;
+}
+.divHeaderMiddle {
+  flex: 1;
+  justify-content: center;
+}
+.divHeaderMiddleName {
+  text-align: center;
+  color: white;
+}
+.divHeaderMiddleApiUrl {
+  text-align: center;
+  color: white;
+  font-size: 0.75rem;
+}
+.divHeaderRight {
+  padding: 0.5rem;
+}
+
+.hamburgerMenu {
+  display: block; /* Visible on small screens */
+  font-size: 1.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.faHamburgerMenu {
+  font-size: 1.5rem;
+  color: white;
+}
+.divLeftChildren {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  /* border: 4px dashed black; */
+}
+.divRightMenu {
+  background-color: var(--bg-navbar-top);
+  opacity: 0.5;
+  position: fixed;
+  z-index: 2;
+  right: 0;
+  top: 0;
+  width: var(--width-side-menu);
+  margin-top: var(--height-header);
+  height: calc(100vh - var(--height-header));
+}
+.divRightMenuClose {
+  width: var(--width-side-menu);
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 0.5rem;
+  padding-top: 0.5rem;
+}
+
+.faXmark {
+  font-size: 2rem;
+  color: gray;
+}
+.faXmark:hover {
+  color: white;
+}
+.divRightMenu a {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  color: white;
+  text-decoration: none;
+}
+.divRightMenu a:hover {
+  border: 1px solid white;
+}
+.divRightMenu a.active {
+  background-color: black;
+}
+
+.divCredits {
+  color: white;
+  font-size: 0.75rem;
+}
+
+/* Large screens (media query) */
+@media (min-width: 768px) {
+  .headerCustom {
+    /* height: var(--height-header-top-large); */
+    height: var(--height-header-large);
+  }
+  .divTemplateViewMain {
+    /* margin-top: var(--height-header-large); */
+    margin-top: 11vh;
+  }
+  .divRightMenu {
+    /* margin-top: 10vh;
+    height: 90vh; */
+    margin-top: var(--height-header-large);
+    height: var(--height-content-main-large);
+  }
+
+  .divHeaderMiddleName {
+    font-size: 1.5rem;
+  }
+  .divHeaderMiddleApiUrl {
+    font-size: 1rem;
+  }
+  .divHeaderLeft {
+    padding: 1rem;
+  }
+  .imgNewsNexusLogo {
+    width: 80px;
+  }
+  .divHeaderRight {
+    padding: 1rem;
+  }
+  .faHamburgerMenu {
+    font-size: 2.5rem;
+    /* color: white; */
+  }
+}
+
+/* Modal */
+/* Modal */
+
+.openModalButton {
+  /* padding: 10px 20px; */
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.openModalButton:hover {
+  background-color: #0056b3;
+}

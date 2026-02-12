@@ -1,0 +1,54 @@
+.main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 4rem 0;
+  background-color: var(--background-color);
+}
+
+.divMainSub {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.divTitles {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.title {
+  line-height: 1.15;
+  font-size: 4rem;
+  /* color: var(--light-text-color); */
+  text-align: center;
+}
+
+.divInputsAndBtns {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+.divSuperInput {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+.inputEmail {
+  border-radius: 12px;
+  font-size: xx-large;
+  width: 90%;
+  padding: 1rem;
+  margin-bottom: 2rem;
+}
+.btnRegister {
+  /* background-color: var(--highlight-red); */
+  border-radius: 12px;
+  font-size: xx-large;
+  padding: 1rem;
+  width: 15rem;
+  /* color: var(--light-text-color); */
+}
