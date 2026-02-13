@@ -1,6 +1,8 @@
 # OS
 .DS_Store
-
+ios/
+android/
+.expo/
 # Environment
 .env
 *.env.local
