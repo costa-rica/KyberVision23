@@ -1,5 +1,3 @@
-<!-- ![Logo](../docs/images/kyberVisionLogo01.png) -->
-
 ![Logo](../docs/images/kyberVisionLogo01.png)
 
 # Web Manager v23
