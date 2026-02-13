@@ -12,6 +12,10 @@ export function verifyCheckDirectoryExists(): void {
     process.env.PATH_VIDEOS_UPLOADED,
     process.env.PATH_DB_BACKUPS,
     process.env.PATH_PROFILE_PICTURES_PLAYER_DIR,
+    // Subdirectories derived from PATH_PROJECT_RESOURCES
+    process.env.PATH_PROJECT_RESOURCES
+      ? `${process.env.PATH_PROJECT_RESOURCES}/uploads-delete-ok`
+      : undefined,
   ].filter((path): path is string => typeof path === "string");
 
   pathsToCheck.forEach((dirPath) => {

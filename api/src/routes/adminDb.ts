@@ -231,9 +231,57 @@ router.get(
 router.post(
   "/import-db-backup",
   authenticateToken,
-  upload.single("backupFile"),
+  (req: Request, res: Response, next) => {
+    logger.info(
+      `- in POST /admin-db/import-db-backup — request received, content-length: ${req.headers["content-length"] ?? "unknown"} bytes`,
+    );
+    req.on("close", () => {
+      logger.warn(
+        "- /import-db-backup — req 'close' event fired (client disconnected or request finished)",
+      );
+    });
+    req.on("aborted", () => {
+      logger.warn(
+        "- /import-db-backup — req 'aborted' event fired (client dropped connection)",
+      );
+    });
+    next();
+  },
+  (req: Request, res: Response, next) => {
+    logger.info(
+      `- /import-db-backup — invoking multer, content-type: ${req.headers["content-type"] ?? "unknown"}`,
+    );
+    const sock = req.socket;
+    logger.info(
+      `- /import-db-backup — socket state before multer: destroyed=${sock?.destroyed}, readable=${sock?.readable}, writable=${sock?.writable}`,
+    );
+    logger.info(
+      `- /import-db-backup — req state before multer: destroyed=${req.destroyed}, readable=${(req as any).readable}`,
+    );
+    sock?.on("close", (hadError) => {
+      logger.warn(`- /import-db-backup — socket 'close' fired, hadError=${hadError}`);
+    });
+    sock?.on("error", (sockErr) => {
+      logger.error(`- /import-db-backup — socket 'error': ${sockErr?.message} | code: ${(sockErr as any)?.code}`);
+    });
+    upload.single("backupFile")(req, res, (err) => {
+      if (err) {
+        logger.error(
+          `- /import-db-backup — multer error — message: "${err?.message}" | code: "${(err as any)?.code}" | name: "${err?.name}" | type: ${typeof err} | string: "${String(err)}"`,
+        );
+        logger.error("- /import-db-backup — multer error stack:", { stack: err?.stack });
+        return res
+          .status(500)
+          .json({ result: false, message: "File upload failed", error: String(err) });
+      }
+      logger.info(
+        `- /import-db-backup — multer succeeded, req.file: ${JSON.stringify(req.file ?? null)}`,
+      );
+      next();
+    });
+  },
   async (req: Request, res: Response) => {
-    logger.info("- in POST /admin-db/import-db-backup");
+    logger.info("- in POST /admin-db/import-db-backup — multer complete, processing file");
 
     try {
       if (!req.file) {
