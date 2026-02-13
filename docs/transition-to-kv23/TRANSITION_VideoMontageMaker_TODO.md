@@ -1,11 +1,11 @@
 # TRANSITION VideoMontageMaker TODO
 
 ## Phase 1: Discovery and Decisions
-- [ ] Review KV22VideoMontageMaker entrypoints and helpers (`index.js`, `modules/apiRequests.js`, `modules/watermark.js`).
-- [ ] Catalog required env vars used by montage flow (`PATH_VIDEOS_UPLOADED`, `PATH_VIDEOS_MONTAGE_CLIPS`, `PATH_VIDEOS_MONTAGE_COMPLETE`, `URL_LOCAL_KV_API_FOR_VIDEO_MONTAGE_MAKER`, optional `PATH_TEST_REQUEST_ARGS`).
-- [ ] Confirm API callback contract for `/videos/montage-service/video-completed-notify-user` (payload + auth header expectations).
-- [ ] Decide worker-node module layout and naming (e.g., `src/modules/videoMontageService.ts`, `src/modules/videoMontageApi.ts`).
-- [ ] Decide where the watermark asset will live inside worker-node and how it is packaged for `dist/`.
+- [x] Review KV22VideoMontageMaker entrypoints and helpers (`index.js`, `modules/apiRequests.js`, `modules/watermark.js`).
+- [x] Catalog required env vars used by montage flow (`PATH_VIDEOS_UPLOADED`, `PATH_VIDEOS_MONTAGE_CLIPS`, `PATH_VIDEOS_MONTAGE_COMPLETE`, `URL_LOCAL_KV_API_FOR_VIDEO_MONTAGE_MAKER`, optional `PATH_TEST_REQUEST_ARGS`).
+- [x] Confirm API callback contract for `/videos/montage-service/video-completed-notify-user` (payload + auth header expectations).
+- [x] Decide worker-node module layout and naming (e.g., `src/modules/videoMontageService.ts`, `src/modules/videoMontageApi.ts`).
+- [x] Decide where the watermark asset will live inside worker-node and how it is packaged for `dist/`.
 
 ## Phase 2: Dependency and Asset Migration
 - [ ] Add `axios` and `fluent-ffmpeg` to `worker-node/package.json` dependencies.
