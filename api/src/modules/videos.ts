@@ -162,7 +162,9 @@ export async function requestJobQueuerVideoUploaderYouTubeProcessing(
   videoId: number,
 ): Promise<YouTubeProcessingResult> {
   try {
-    const response = await fetch("http://localhost:8003/youtube-uploader/add", {
+    const url = `${process.env.URL_KV_JOB_QUEUER}/youtube-uploader/add`;
+    logger.info(`Sending YouTube upload job request to: ${url}`);
+    const response = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
