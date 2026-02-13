@@ -8,6 +8,19 @@ The API is built using ExpressJS, formerly called KyberVision22API. The web-mana
 
 The project also used a KyberVision22Queuer which is an ExpressJS application that uses BullMQ to manage a queue of jobs. It would run other services as child processes. These child processes were KyberVision22VideoMontageMaker and KyberVision22YouTubeUploader.
 
+## Crosswalk
+
+| first level directory | KyberVision22        |
+| --------------------- | -------------------- |
+| api/                  | KyberVision22API     |
+| web-manager/          | KyberVision22Manager |
+| database/             | KyberVision22Db      |
+| worker-node/          | KyberVision22Queuer  |
+
+### worker-node future implementation
+
+KyberVision22VideoMontageMaker and KyberVision22YouTubeUploader will be absorbed into the worker-node/ project.
+
 ## Migrating KyberVision22Queuer
 
 The KyberVision22Queuer is now moved to the worker-node/ subproject directory. It is will be its own service that will instead of running the child processes, we will want to migrate the KyberVision22VideoMontageMaker and KyberVision22YouTubeUploader into the worker-node/ subproject directory as well. The worker-node/ will be an API / BullMQ service that will queue the jobs and process the functionalities that KyberVision22VideoMontageMaker and KyberVision22YouTubeUploader were doing a child processes.
