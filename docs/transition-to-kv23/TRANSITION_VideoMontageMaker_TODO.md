@@ -22,10 +22,10 @@
 - [x] Centralize cleanup of montage clips on success and failure.
 
 ## Phase 4: Worker Integration
-- [ ] Replace child process spawn in `worker-node/src/routes/montageVideoMaker.ts` with a direct function call.
-- [ ] Map job progress updates to internal steps (clip creation, merge, watermark, API notify).
-- [ ] Keep job payload shape (`filename`, `actionsArray`, `user`, `token`) unchanged for API compatibility.
-- [ ] Remove references to `PATH_TO_VIDEO_MONTAGE_MAKER_SERVICE` from montage worker logic.
+- [x] Replace child process spawn in `worker-node/src/routes/montageVideoMaker.ts` with a direct function call.
+- [x] Map job progress updates to internal steps (clip creation, merge, watermark, API notify).
+- [x] Keep job payload shape (`filename`, `actionsArray`, `user`, `token`) unchanged for API compatibility.
+- [x] Remove references to `PATH_TO_VIDEO_MONTAGE_MAKER_SERVICE` from montage worker logic.
 
 ## Phase 5: Configuration and Docs
 - [ ] Update `worker-node/.env.example` to remove `PATH_TO_VIDEO_MONTAGE_MAKER_SERVICE` and document any new vars.

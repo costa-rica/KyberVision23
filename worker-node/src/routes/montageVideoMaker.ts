@@ -1,9 +1,8 @@
 import express, { Request, Response } from "express";
 import { Queue, Worker, Job } from "bullmq";
 import Redis from "ioredis";
-import path from "path";
-import { spawn } from "child_process";
 import logger from "../modules/logger";
+import { createVideoMontage } from "../modules/videoMontageService";
 
 const router = express.Router();
 
@@ -27,48 +26,19 @@ const worker = new Worker(
     logger.info(`🎬 Starting Montage Job ID: ${job.id}`);
     const { filename, actionsArray, token, user } = job.data;
 
-    const child = spawn(
-      "node",
-      [
-        "index.js",
-        filename,
-        JSON.stringify(actionsArray),
-        JSON.stringify(user),
-        token,
-      ],
-      {
-        cwd: path.join(process.env.PATH_TO_VIDEO_MONTAGE_MAKER_SERVICE as string),
-        stdio: ["pipe", "pipe", "pipe"],
+    await createVideoMontage(
+      filename,
+      actionsArray,
+      user,
+      token,
+      async (progress: number, message: string) => {
+        await job.updateProgress(progress);
+        await job.log(message);
+        logger.info(`🎬 Montage progress ${progress}%: ${message}`);
       }
     );
 
-    let progress = 0;
-    const totalSteps = 5;
-
-    child.stdout.on("data", async (data: Buffer) => {
-      const message = data.toString().trim();
-      logger.info(`Microservice Output: ${message}`);
-      if (message) {
-        progress += 1;
-        await job.updateProgress((progress / totalSteps) * 100);
-        await job.log(message);
-      }
-    });
-
-    child.stderr.on("data", (data: Buffer) => {
-      logger.error(`Microservice Error: ${data}`);
-    });
-
-    return new Promise<{ success: boolean }>((resolve, reject) => {
-      child.on("close", (code: number | null) => {
-        logger.info(`Microservice exited with code ${code}`);
-        if (code === 0) {
-          resolve({ success: true });
-        } else {
-          reject(new Error(`Montage process failed with code ${code}`));
-        }
-      });
-    });
+    return { success: true };
   },
   {
     connection: redisConnection,
