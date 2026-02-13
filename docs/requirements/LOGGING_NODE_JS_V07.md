@@ -96,6 +96,7 @@ The logger configuration file should be placed based on existing project structu
    - `src/config/`
    - `lib/config/`
    - `src/lib/config/`
+   - `src/modules/`
 2. If any of these directories exist, place `logger.js` (or `logger.ts`) there
 3. If none exist, ask the user where they want the logger file placed (e.g., `modules/`, `lib/`, `utils/`, etc.)
 
@@ -130,7 +131,7 @@ Environment variable validation occurs in the logger configuration file before l
 
 1. **Wrap application in async IIFE**: Use `(async () => { ... })()` pattern to enable early returns with proper cleanup
 2. **Log before exit**: Call `logger.info()` or `logger.warn()` with exit reason
-3. **Add console.error**: Write critical messages to stderr for immediate visibility (important when tailing systemd logs)
+3. **Add logger.error**: Write critical messages to stderr for immediate visibility (important when tailing systemd logs)
 4. **Delay before exit**: Add `await new Promise((resolve) => setTimeout(resolve, 100))` to give Winston 100ms to flush buffer to disk
 5. **Then exit**: Call `process.exit(0)` or `process.exit(1)` as appropriate
 

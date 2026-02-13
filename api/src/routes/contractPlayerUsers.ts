@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import { ContractPlayerUser } from "@kybervision/db";
 import { authenticateToken } from "../modules/userAuthentication";
+import logger from "../modules/logger";
 
 const router = express.Router();
 
@@ -9,7 +10,7 @@ router.post(
   "/link-user-to-player",
   authenticateToken,
   async (req: Request, res: Response) => {
-    console.log("- accessed POST /contract-player-users/link-user-to-player");
+    logger.info("- accessed POST /contract-player-users/link-user-to-player");
 
     try {
       const { playerId, userId } = req.body;
@@ -48,7 +49,7 @@ router.post(
 
       res.json({ result: true, contractPlayerUserObject });
     } catch (error: any) {
-      console.error("❌ Error linking user to player:", error);
+      logger.error("❌ Error linking user to player:", error);
       res.status(500).json({
         result: false,
         message: "Error linking user to player",
@@ -63,17 +64,17 @@ router.delete(
   "/:playerId",
   authenticateToken,
   async (req: Request, res: Response) => {
-    console.log("- accessed DELETE /contract-player-users/:playerId");
+    logger.info("- accessed DELETE /contract-player-users/:playerId");
 
     try {
       const playerId = Number(req.params.playerId);
-      console.log(`playerId: ${playerId}`);
+      logger.info(`playerId: ${playerId}`);
 
       await ContractPlayerUser.destroy({ where: { playerId } });
 
       res.json({ result: true });
     } catch (error: any) {
-      console.error("❌ Error deleting contract player user:", error);
+      logger.error("❌ Error deleting contract player user:", error);
       res.status(500).json({
         result: false,
         message: "Error deleting contract player user",

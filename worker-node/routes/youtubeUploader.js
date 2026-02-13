@@ -27,14 +27,14 @@ const worker = new Worker(
   // process.env.NAME_APP,
   process.env.YOUTUBE_UPLOADER_QUEUE_NAME,
   async (job) => {
-    console.log(`⚙️ Starting Job ID: ${job.id}`);
+    logger.info(`⚙️ Starting Job ID: ${job.id}`);
 
     // Spawn a child process to run the microservice
     const { filename, videoId } = job.data;
 
-    console.log("--- New Logging ---");
-    console.log(`filename: ${filename}`);
-    console.log(`videoId: ${videoId}`);
+    logger.info("--- New Logging ---");
+    logger.info(`filename: ${filename}`);
+    logger.info(`videoId: ${videoId}`);
 
     const child = spawn(
       "node",
@@ -51,7 +51,7 @@ const worker = new Worker(
     // Capture the stdout stream (Output from the microservice)
     child.stdout.on("data", async (data) => {
       const message = data.toString().trim();
-      console.log(`Microservice Output: ${message}`);
+      logger.info(`Microservice Output: ${message}`);
 
       if (message) {
         progress += 1;
@@ -63,7 +63,7 @@ const worker = new Worker(
     // Capture the stderr stream (Errors from the microservice)
     // child.stderr.on("data", (data) => {
     child.stderr.on("data", async (data) => {
-      console.error(`Microservice Error: ${data}`);
+      logger.error(`Microservice Error: ${data}`);
       const uploadedVideo = await Video.findByPk(videoId);
       uploadedVideo.processingFailed = true;
       await uploadedVideo.save();
@@ -73,7 +73,7 @@ const worker = new Worker(
     // Capture the 'close' event when the process finishes
     return new Promise((resolve, reject) => {
       child.on("close", (code) => {
-        console.log(`Microservice exited with code ${code}`);
+        logger.info(`Microservice exited with code ${code}`);
         if (code === 0) {
           resolve({ success: true });
         } else {
@@ -89,11 +89,11 @@ const worker = new Worker(
 );
 
 worker.on("completed", (job) => {
-  console.log(`🎉 Job ${job.id} has been completed!`);
+  logger.info(`🎉 Job ${job.id} has been completed!`);
 });
 
 worker.on("failed", (job, err) => {
-  console.error(`❌ Job ${job.id} failed: ${err.message}`);
+  logger.error(`❌ Job ${job.id} failed: ${err.message}`);
 });
 
 // POST /youtube-uploader/add
@@ -102,11 +102,11 @@ router.post("/add", async (req, res) => {
     let { filename, videoId, queueName } = req.body;
 
     if (!queueName) {
-      console.error("- No queue name provided, assigning default name");
+      logger.error("- No queue name provided, assigning default name");
       queueName = process.env.YOUTUBE_UPLOADER_QUEUE_NAME;
     }
 
-    console.log(`Adding job to queue: ${queueName}`);
+    logger.info(`Adding job to queue: ${queueName}`);
     // Create a dynamic queue using the name passed
     const dynamicQueue = new Queue(queueName, {
       connection: redisConnection,
@@ -124,13 +124,13 @@ router.post("/add", async (req, res) => {
       },
     );
 
-    console.log(`Job added to queue '${queueName}' with ID: ${job.id}`);
+    logger.info(`Job added to queue '${queueName}' with ID: ${job.id}`);
 
     res
       .status(200)
       .json({ message: "Job triggered successfully!", jobId: job.id });
   } catch (error) {
-    console.error("❌ Error triggering job:", error.message);
+    logger.error("❌ Error triggering job:", error.message);
     res.status(500).json({ error: "Error triggering job" });
   }
 });

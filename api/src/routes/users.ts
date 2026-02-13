@@ -10,6 +10,7 @@ import { authenticateToken } from "../modules/userAuthentication";
 import { deleteVideoFromYouTube, deleteVideo } from "../modules/videos";
 import { Video } from "@kybervision/db";
 import { recordPing } from "../modules/common";
+import logger from "../modules/logger";
 
 // Import from the KyberVision23Db package
 import { User, ContractTeamUser, PendingInvitations } from "@kybervision/db";
@@ -44,16 +45,16 @@ router.post("/register", async (req: Request, res: Response) => {
   const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET!);
 
   const areWeOnMacMiniWorkstation = os.hostname();
-  console.log(`areWeOnMacMiniWorkstation: ${areWeOnMacMiniWorkstation}`);
+  logger.info(`areWeOnMacMiniWorkstation: ${areWeOnMacMiniWorkstation}`);
   if (
     areWeOnMacMiniWorkstation !== "Nicks-Mac-mini.local" &&
     areWeOnMacMiniWorkstation !== "Nicks-MacBook-Air.local"
   ) {
     await sendRegistrationEmail(email, username)
-      .then(() => console.log("Email sent successfully"))
-      .catch((error) => console.error("Email failed:", error));
+      .then(() => logger.info("Email sent successfully"))
+      .catch((error) => logger.error("Email failed:", error));
   } else {
-    console.log("Email not sent");
+    logger.info("Email not sent");
   }
 
   // Check if pending invitation exists
@@ -93,7 +94,7 @@ router.post("/login", async (req: Request, res: Response) => {
   } = req.body;
 
   // Log the entire request body for testing/verification
-  console.log(
+  logger.info(
     "📱 POST /users/login - Request Body:",
     JSON.stringify(req.body, null, 2),
   );
@@ -115,7 +116,7 @@ router.post("/login", async (req: Request, res: Response) => {
     });
   }
   if (userDeviceTimestamp) {
-    console.log("🚨 Recording ping with device data");
+    logger.info("🚨 Recording ping with device data");
     const ping = await recordPing({
       userId: user.id,
       serverTimestamp: new Date(),
@@ -129,7 +130,7 @@ router.post("/login", async (req: Request, res: Response) => {
       osName,
       osVersion,
     });
-    console.log("✅ Ping recorded:", ping);
+    logger.info("✅ Ping recorded:", ping);
   }
 
   const isPasswordValid = await bcrypt.compare(password, user.password);
@@ -170,11 +171,11 @@ router.post(
       expiresIn: "1h",
     });
 
-    // console.log("[ POST /users/request-reset-password-email 1]token:", token);
+    // logger.info("[ POST /users/request-reset-password-email 1]token:", token);
 
     await sendResetPasswordEmail(email, token)
-      .then(() => console.log("Email sent successfully"))
-      .catch((error) => console.error("Email failed:", error));
+      .then(() => logger.info("Email sent successfully"))
+      .catch((error) => logger.error("Email failed:", error));
 
     res.status(200).json({ message: "Email sent successfully" });
   },
@@ -240,7 +241,7 @@ router.delete(
 router.post(
   "/register-or-login-via-google",
   async (req: Request, res: Response) => {
-    console.log("--- POST /users/register-or-login-via-google 1 ----");
+    logger.info("--- POST /users/register-or-login-via-google 1 ----");
     try {
       const { email, name } = req.body as { email?: string; name?: string };
 
@@ -327,7 +328,7 @@ router.post(
         user: userWithoutPassword,
       });
     } catch (err: any) {
-      console.error("Google register/login error:", err);
+      logger.error("Google register/login error:", err);
       return res
         .status(500)
         .json({ error: err?.message || "Internal server error" });

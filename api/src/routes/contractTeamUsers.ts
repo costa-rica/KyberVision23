@@ -10,6 +10,7 @@ import {
 import { authenticateToken } from "../modules/userAuthentication";
 import jwt from "jsonwebtoken";
 import { sendJoinSquadNotificationEmail } from "../modules/mailer";
+import logger from "../modules/logger";
 
 const router = express.Router();
 
@@ -18,11 +19,11 @@ const router = express.Router();
 
 // GET /contract-team-users
 router.get("/", authenticateToken, async (req: Request, res: Response) => {
-  console.log("- accessed GET /contract-team-users");
-  // console.log(" 👉 Called by SelectTeamScreen in mobile app");
+  logger.info("- accessed GET /contract-team-users");
+  // logger.info(" 👉 Called by SelectTeamScreen in mobile app");
   try {
     const userId = req.user.id;
-    console.log(`userId: ${userId} -- user sending request to API`);
+    logger.info(`userId: ${userId} -- user sending request to API`);
     const contractTeamUsers = await ContractTeamUser.findAll({
       where: { userId },
       include: [
@@ -32,9 +33,9 @@ router.get("/", authenticateToken, async (req: Request, res: Response) => {
         },
       ],
     });
-    // console.log(" --- contractTeamUsers ------");
-    // console.log(contractTeamUsers[0].dataValues);
-    // console.log(" -----------------------------");
+    // logger.info(" --- contractTeamUsers ------");
+    // logger.info(contractTeamUsers[0].dataValues);
+    // logger.info(" -----------------------------");
 
     // const teamsArray = groupContracts.map((gc) => gc.Team);
     const teamsArray = await Promise.all(
@@ -42,7 +43,7 @@ router.get("/", authenticateToken, async (req: Request, res: Response) => {
         const ctuJSON = ctu.toJSON() as any;
         const team = ctuJSON.Team; // convert to plain object
         if (!team) {
-          console.log(
+          logger.info(
             "Warning: Team association not found for ContractTeamUser",
             ctu.id,
           );
@@ -72,7 +73,7 @@ router.get("/", authenticateToken, async (req: Request, res: Response) => {
       contractTeamUserArray: contractTeamUserArrayModified,
     });
   } catch (error: any) {
-    console.log(error);
+    logger.info(error);
     res.status(500).json({
       error: "Error retrieving contractTeamUsers",
       details: error.message,
@@ -115,11 +116,11 @@ router.get(
   "/:teamId",
   authenticateToken,
   async (req: Request, res: Response) => {
-    console.log("------- > accessed GET /contract-team-users/:teamId");
-    // console.log(" 👉 Called by AdminSettings in mobile app");
+    logger.info("------- > accessed GET /contract-team-users/:teamId");
+    // logger.info(" 👉 Called by AdminSettings in mobile app");
     try {
       const teamId = Number(req.params.teamId);
-      console.log(`teamId: ${teamId}`);
+      logger.info(`teamId: ${teamId}`);
       const contractTeamUser = await ContractTeamUser.findAll({
         where: { teamId },
         include: {
@@ -133,7 +134,7 @@ router.get(
         },
       });
 
-      // console.log(JSON.stringify(contractTeamUser, null, 2));
+      // logger.info(JSON.stringify(contractTeamUser, null, 2));
 
       const squadArray = contractTeamUser.map((ctu) => {
         const ctuJSON = ctu.toJSON() as any;
@@ -183,7 +184,7 @@ router.post(
   "/add-squad-member",
   authenticateToken,
   async (req: Request, res: Response) => {
-    console.log(
+    logger.info(
       "------- > accessed POST /contract-team-users/add-squad-member",
     );
     try {
@@ -191,7 +192,7 @@ router.post(
       const teamIdNumber = Number(teamId);
       const user = await User.findOne({ where: { email } });
       if (!user) {
-        console.log("-- User not found, triggering email function --  ");
+        logger.info("-- User not found, triggering email function --  ");
 
         // check if pending invitation exists
         const pendingInvitation = await PendingInvitations.findOne({
@@ -235,7 +236,7 @@ router.get(
   "/create-join-token/:teamId",
   authenticateToken,
   async (req: Request, res: Response) => {
-    console.log(
+    logger.info(
       "- accessed GET /contract-team-users/create-join-token/:teamId",
     );
     const teamId = Number(req.params.teamId);
@@ -253,7 +254,7 @@ router.get(
   "/join/:joinToken",
   authenticateToken,
   async (req: Request, res: Response) => {
-    console.log("- accessed GET /contract-team-users/join/:joinToken");
+    logger.info("- accessed GET /contract-team-users/join/:joinToken");
     const joinToken = req.params.joinToken;
     jwt.verify(
       joinToken,
@@ -284,12 +285,12 @@ router.post(
   "/toggle-role",
   authenticateToken,
   async (req: Request, res: Response) => {
-    console.log("- accessed POST /contract-team-users/toggle-role");
+    logger.info("- accessed POST /contract-team-users/toggle-role");
     try {
       const { teamId, role, userId } = req.body;
-      console.log(`userId: ${userId}`);
-      console.log(`teamId: ${teamId}`);
-      console.log(`role: ${role}`);
+      logger.info(`userId: ${userId}`);
+      logger.info(`teamId: ${teamId}`);
+      logger.info(`role: ${role}`);
       const contractTeamUser = await ContractTeamUser.findOne({
         where: { teamId: Number(teamId), userId },
       });
@@ -322,7 +323,7 @@ router.post(
 
 // DELETE /contract-team-users/
 router.delete("/", authenticateToken, async (req: Request, res: Response) => {
-  console.log("- accessed DELETE /contract-team-users/");
+  logger.info("- accessed DELETE /contract-team-users/");
   try {
     const { contractTeamUserId } = req.body;
     const contractTeamUser = await ContractTeamUser.findOne({

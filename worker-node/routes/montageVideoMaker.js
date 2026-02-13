@@ -21,7 +21,7 @@ const montageQueue = new Queue(process.env.NAME_KV_VIDEO_MONTAGE_MAKER_QUEUE, {
 const worker = new Worker(
   process.env.NAME_KV_VIDEO_MONTAGE_MAKER_QUEUE,
   async (job) => {
-    console.log(`🎬 Starting Montage Job ID: ${job.id}`);
+    logger.info(`🎬 Starting Montage Job ID: ${job.id}`);
     const { filename, actionsArray, token, user } = job.data;
 
     const child = spawn(
@@ -44,7 +44,7 @@ const worker = new Worker(
 
     child.stdout.on("data", async (data) => {
       const message = data.toString().trim();
-      console.log(`Microservice Output: ${message}`);
+      logger.info(`Microservice Output: ${message}`);
       if (message) {
         progress += 1;
         await job.updateProgress((progress / totalSteps) * 100);
@@ -53,12 +53,12 @@ const worker = new Worker(
     });
 
     child.stderr.on("data", (data) => {
-      console.error(`Microservice Error: ${data}`);
+      logger.error(`Microservice Error: ${data}`);
     });
 
     return new Promise((resolve, reject) => {
       child.on("close", (code) => {
-        console.log(`Microservice exited with code ${code}`);
+        logger.info(`Microservice exited with code ${code}`);
         if (code === 0) {
           resolve({ success: true });
         } else {
@@ -74,11 +74,11 @@ const worker = new Worker(
 );
 
 worker.on("completed", (job) => {
-  console.log(`✅ Montage Job ${job.id} completed`);
+  logger.info(`✅ Montage Job ${job.id} completed`);
 });
 
 worker.on("failed", (job, err) => {
-  console.error(`❌ Montage Job ${job.id} failed: ${err.message}`);
+  logger.error(`❌ Montage Job ${job.id} failed: ${err.message}`);
 });
 
 // POST /video-montage-maker/add
@@ -95,10 +95,10 @@ router.post("/add", async (req, res) => {
       },
     );
 
-    console.log(`📥 Job added to montage queue with ID: ${job.id}`);
+    logger.info(`📥 Job added to montage queue with ID: ${job.id}`);
     res.status(200).json({ message: "Montage job added", jobId: job.id });
   } catch (error) {
-    console.error("❌ Error adding montage job:", error.message);
+    logger.error("❌ Error adding montage job:", error.message);
     res.status(500).json({ error: "Failed to queue montage job" });
   }
 });
@@ -118,8 +118,8 @@ module.exports = router;
 // router.post("/add", async (req, res) => {
 //   const job = await montageQueue.add("montage", req.body);
 
-//   console.log("KyberVision23Queuer ---- Job added to queue with ID: ", job.id);
-//   console.log(JSON.stringify(req.body));
+//   logger.info("KyberVision23Queuer ---- Job added to queue with ID: ", job.id);
+//   logger.info(JSON.stringify(req.body));
 
 //   const { filename, actionsArray, token, user } = req.body;
 

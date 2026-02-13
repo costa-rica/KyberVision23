@@ -13,6 +13,7 @@ import {
   createUniquePlayerNamesArray,
   createUniquePlayerObjArray,
 } from "../modules/players";
+import logger from "../modules/logger";
 
 const router = express.Router();
 
@@ -21,7 +22,7 @@ router.post(
   "/review-selection-screen/get-actions",
   authenticateToken,
   async (req: Request, res: Response) => {
-    console.log(`- in POST /sessions/review-selection-screen/get-actions`);
+    logger.info(`- in POST /sessions/review-selection-screen/get-actions`);
 
     try {
       const { sessionId, videoId } = req.body;
@@ -121,7 +122,7 @@ router.post(
         playerDbObjectsArray: uniqueListOfPlayerObjArray,
       });
     } catch (error: any) {
-      console.error("❌ Error fetching scripts for sessionId:", error);
+      logger.error("❌ Error fetching scripts for sessionId:", error);
       res.status(500).json({
         result: false,
         message: "Internal server error",
@@ -136,11 +137,11 @@ router.get(
   "/:teamId",
   authenticateToken,
   async (req: Request, res: Response) => {
-    console.log(`- in GET /sessions/${req.params.teamId}`);
+    logger.info(`- in GET /sessions/${req.params.teamId}`);
 
     try {
       const { teamId } = req.params;
-      console.log(`teamId: ${teamId}`);
+      logger.info(`teamId: ${teamId}`);
 
       // 🔹 Find all Sessions linked to this teamId
       const sessionsArray = await Session.findAll({
@@ -170,7 +171,7 @@ router.get(
 
       res.json({ result: true, sessionsArray: formattedSessionsArray });
     } catch (error: any) {
-      console.error("❌ Error fetching sessions for teamId:", error);
+      logger.error("❌ Error fetching sessions for teamId:", error);
       res.status(500).json({
         result: false,
         message: "Internal server error",
@@ -185,7 +186,7 @@ router.post(
   "/create",
   authenticateToken,
   async (req: Request, res: Response) => {
-    console.log(`- in POST /sessions/create`);
+    logger.info(`- in POST /sessions/create`);
 
     try {
       const {
@@ -196,9 +197,9 @@ router.post(
         sessionCity,
       } = req.body;
       const city = "Practice";
-      console.log(`teamId: ${teamId}`);
-      console.log(`sessionDate: ${sessionDate}`);
-      console.log(`city: ${city}`);
+      logger.info(`teamId: ${teamId}`);
+      logger.info(`sessionDate: ${sessionDate}`);
+      logger.info(`city: ${city}`);
 
       // find contractLeagueTeam For now use default League
       const contractLeagueTeam = await ContractLeagueTeam.findOne({
@@ -221,7 +222,7 @@ router.post(
         sessionName,
       });
 
-      console.log(`sessionNew: ${JSON.stringify(sessionNew)}`);
+      logger.info(`sessionNew: ${JSON.stringify(sessionNew)}`);
 
       // Format sessionDateString for sessionNew
       const sessionDate_obj = new Date(sessionNew.sessionDate);
@@ -241,13 +242,13 @@ router.post(
           .padStart(2, "0")}`, // "15 mar 20h00"
       };
 
-      console.log(
+      logger.info(
         `formattedSessionNew: ${JSON.stringify(formattedSessionNew)}`,
       );
 
       res.json({ result: true, sessionNew: formattedSessionNew });
     } catch (error: any) {
-      console.error("❌ Error creating session:", error);
+      logger.error("❌ Error creating session:", error);
       res.status(500).json({
         result: false,
         message: "Internal server error",
@@ -263,7 +264,7 @@ router.get(
   "/scripting-sync-video/:sessionId/actions",
   authenticateToken,
   async (req: Request, res: Response) => {
-    console.log(
+    logger.info(
       `- in GET sessions/scripting-sync-video/${req.params.sessionId}/actions`,
     );
     try {
@@ -288,7 +289,7 @@ router.get(
 
       res.json({ result: true, actionsArray });
     } catch (error: any) {
-      console.error("❌ Error fetching actions for session:", error);
+      logger.error("❌ Error fetching actions for session:", error);
       res.status(500).json({
         result: false,
         message: "Internal server error",
@@ -304,7 +305,7 @@ router.get(
   "/scripting-sync-video-screen/get-actions-for-syncing/:sessionId",
   authenticateToken,
   async (req: Request, res: Response) => {
-    console.log("in GET get-actions-for-syncing");
+    logger.info("in GET get-actions-for-syncing");
     try {
       const { sessionId } = req.params;
 
@@ -367,7 +368,7 @@ router.get(
 
       res.json({ result: true, sessionId, actionsArrayByScript });
     } catch (error: any) {
-      console.error("❌ Error fetching actions for session:", error);
+      logger.error("❌ Error fetching actions for session:", error);
       res.status(500).json({
         result: false,
         message: "Internal server error",

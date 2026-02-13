@@ -1,4 +1,5 @@
 import { ContractLeagueTeam, League, Session, Team } from "@kybervision/db";
+import logger from "../modules/logger";
 
 interface SessionResult {
   success: boolean;
@@ -23,7 +24,7 @@ export async function createSessionWithFreeAgentLeague(
     });
 
     if (!freeAgentLeague) {
-      console.log("ℹ️  Free Agent league not found. Skipping setup.");
+      logger.info("ℹ️  Free Agent league not found. Skipping setup.");
       return null;
     }
 
@@ -39,10 +40,10 @@ export async function createSessionWithFreeAgentLeague(
       sessionDate: new Date(),
     });
 
-    console.log(`✅ Session created with Free Agent league.`);
+    logger.info(`✅ Session created with Free Agent league.`);
     return session;
   } catch (err: any) {
-    console.error(`❌ Error creating session with Free Agent league:`, err);
+    logger.error(`❌ Error creating session with Free Agent league:`, err);
     return null;
   }
 }
@@ -54,7 +55,7 @@ export async function createSession(
     const session = await Session.create(sessionData as any);
     return { success: true, session };
   } catch (error: any) {
-    console.error("Error creating session:", error);
+    logger.error("Error creating session:", error);
     return { success: false, error: error.message };
   }
 }
@@ -69,7 +70,7 @@ export async function deleteSession(sessionId: number): Promise<SessionResult> {
     await session.destroy();
     return { success: true };
   } catch (error: any) {
-    console.error("Error deleting session:", error);
+    logger.error("Error deleting session:", error);
     return { success: false, error: error.message };
   }
 }
@@ -113,7 +114,7 @@ export async function getSessionWithTeams(
 
     return { success: true, session: formattedSession };
   } catch (error: any) {
-    console.error("Error fetching session with teams:", error);
+    logger.error("Error fetching session with teams:", error);
     return { success: false, error: error.message };
   }
 }

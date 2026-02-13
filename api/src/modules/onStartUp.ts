@@ -1,6 +1,7 @@
 import fs from "fs";
 import bcrypt from "bcrypt";
 import { User, League } from "@kybervision/db";
+import logger from "../modules/logger";
 
 export function verifyCheckDirectoryExists(): void {
   // Add directory paths to check (and create if they don't exist)
@@ -16,7 +17,7 @@ export function verifyCheckDirectoryExists(): void {
   pathsToCheck.forEach((dirPath) => {
     if (!fs.existsSync(dirPath)) {
       fs.mkdirSync(dirPath, { recursive: true });
-      console.log(`Created directory: ${dirPath}`);
+      logger.info(`Created directory: ${dirPath}`);
     }
   });
 }
@@ -26,7 +27,7 @@ export async function onStartUpCreateLeague(): Promise<void> {
     where: { name: "General League" },
   });
   if (existingLeague) {
-    console.log("ℹ️  General league already initialized. Skipping setup.");
+    logger.info("ℹ️  General league already initialized. Skipping setup.");
     return;
   }
   await League.create({
@@ -37,7 +38,7 @@ export async function onStartUpCreateLeague(): Promise<void> {
 
 export async function onStartUpCreateEnvUsers(): Promise<void> {
   if (!process.env.ADMIN_EMAIL_KV_MANAGER_WEBSITE) {
-    console.warn("⚠️ No admin emails found in env variables.");
+    logger.warn("⚠️ No admin emails found in env variables.");
     return;
   }
 
@@ -46,7 +47,7 @@ export async function onStartUpCreateEnvUsers(): Promise<void> {
     adminEmails = JSON.parse(process.env.ADMIN_EMAIL_KV_MANAGER_WEBSITE);
     if (!Array.isArray(adminEmails)) throw new Error();
   } catch (error) {
-    console.error(
+    logger.error(
       "❌ Error parsing ADMIN_EMAIL_KV_MANAGER_WEBSITE. Ensure it's a valid JSON array.",
     );
     return;
@@ -57,7 +58,7 @@ export async function onStartUpCreateEnvUsers(): Promise<void> {
       const existingUser = await User.findOne({ where: { email } });
 
       if (!existingUser) {
-        console.log(`🔹 Creating admin user: ${email}`);
+        logger.info(`🔹 Creating admin user: ${email}`);
 
         const hashedPassword = await bcrypt.hash("test", 10); // Default password, should be changed later.
 
@@ -70,12 +71,12 @@ export async function onStartUpCreateEnvUsers(): Promise<void> {
           isAdminForKvManagerWebsite: true, // Set admin flag
         });
 
-        console.log(`✅ Admin user created: ${email}`);
+        logger.info(`✅ Admin user created: ${email}`);
       } else {
-        console.log(`ℹ️  User already exists: ${email}`);
+        logger.info(`ℹ️  User already exists: ${email}`);
       }
     } catch (err) {
-      console.error(`❌ Error creating admin user (${email}):`, err);
+      logger.error(`❌ Error creating admin user (${email}):`, err);
     }
   }
 }

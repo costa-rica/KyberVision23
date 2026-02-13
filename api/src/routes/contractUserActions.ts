@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import { ContractUserAction } from "@kybervision/db";
 import { authenticateToken } from "../modules/userAuthentication";
+import logger from "../modules/logger";
 
 const router = express.Router();
 
@@ -21,7 +22,7 @@ router.post(
   "/update-user-favorites",
   authenticateToken,
   async (req: Request, res: Response) => {
-    console.log("- in POST /contract-user-actions/update-user-favorites");
+    logger.info("- in POST /contract-user-actions/update-user-favorites");
     try {
       const {
         sessionId,
@@ -70,24 +71,24 @@ router.post(
       // Step 4: delete contractUserActions that are in existingContractUserActionsArray but not in actionIdsAndFavoriteStatusArray
       for (let i = 0; i < existingContractUserActionsArray.length; i++) {
         const contractUserAction = existingContractUserActionsArray[i];
-        // console.log(`exiting - actionId: ${contractUserAction.actionId}`);
+        // logger.info(`exiting - actionId: ${contractUserAction.actionId}`);
         const action = actionIdsAndFavoriteStatusArray.find(
           (action) => action.actionId === contractUserAction.actionId,
         );
-        // console.log(`action: ${JSON.stringify(action, null, 2)}`);
+        // logger.info(`action: ${JSON.stringify(action, null, 2)}`);
         if (action && action.favorite === false) {
           await contractUserAction.destroy();
         }
       }
 
-      // console.log(`scriptsArray: ${JSON.stringify(scriptsArray, null, 2)}`);
+      // logger.info(`scriptsArray: ${JSON.stringify(scriptsArray, null, 2)}`);
 
       res.json({
         result: true,
         message: "User favorites updated successfully",
       });
     } catch (error: any) {
-      console.error("❌ Error updating user favorites:", error);
+      logger.error("❌ Error updating user favorites:", error);
       res.status(500).json({
         result: false,
         error: "Internal server error",

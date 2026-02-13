@@ -5,6 +5,7 @@ import { Video } from "@kybervision/db";
 import ffmpeg from "fluent-ffmpeg";
 import axios from "axios";
 import { google } from "googleapis";
+import logger from "../modules/logger";
 
 interface VideoDeleteResult {
   success: boolean;
@@ -88,7 +89,7 @@ export async function deleteVideo(videoId: number): Promise<VideoDeleteResult> {
     // Delete from original location
     fs.unlink(filePathToVideoFile, (err) => {
       if (err) {
-        console.error(`❌ Error deleting file ${filePathToVideoFile}:`, err);
+        logger.error(`❌ Error deleting file ${filePathToVideoFile}:`, err);
       }
     });
 
@@ -100,7 +101,7 @@ export async function deleteVideo(videoId: number): Promise<VideoDeleteResult> {
 
     fs.unlink(filePathToVideoFileInUpload, (err) => {
       if (err) {
-        console.error(
+        logger.error(
           `❌ Error deleting file ${filePathToVideoFileInUpload}:`,
           err,
         );
@@ -110,7 +111,7 @@ export async function deleteVideo(videoId: number): Promise<VideoDeleteResult> {
     await video.destroy();
     return { success: true, message: "Video deleted successfully" };
   } catch (error: any) {
-    console.error("Error deleting video:", error);
+    logger.error("Error deleting video:", error);
     return { success: false, error: error.message };
   }
 }
@@ -140,15 +141,15 @@ export async function deleteVideoFromYouTube(
       auth: oauth2Client,
     });
 
-    console.log(`YouTube video ID: ${video.youTubeVideoId}`);
+    logger.info(`YouTube video ID: ${video.youTubeVideoId}`);
     await youtube.videos.delete({
       id: video.youTubeVideoId,
     });
 
-    console.log(`✅ Deleted YouTube video ID: ${video.youTubeVideoId}`);
+    logger.info(`✅ Deleted YouTube video ID: ${video.youTubeVideoId}`);
     return { success: true, message: "YouTube video deleted successfully" };
   } catch (err: any) {
-    console.log(
+    logger.info(
       "Error (not critical) deleting video from YouTube:",
       err.message,
     );
@@ -177,14 +178,14 @@ export async function requestJobQueuerVideoUploaderYouTubeProcessing(
     }
 
     const responseJson = await response.json();
-    console.log("✅ Queuer YouTube response:", responseJson);
+    logger.info("✅ Queuer YouTube response:", responseJson);
 
     return {
       result: true,
       messageFromYouTubeQueuer: "YouTube video uploaded successfully",
     };
   } catch (err: any) {
-    console.error("❌ Error contacting YouTube Queuer:", err.message);
+    logger.error("❌ Error contacting YouTube Queuer:", err.message);
 
     return {
       result: false,

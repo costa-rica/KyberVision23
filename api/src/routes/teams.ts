@@ -9,6 +9,7 @@ import {
 } from "@kybervision/db";
 import { authenticateToken } from "../modules/userAuthentication";
 import { addNewPlayerToTeam } from "../modules/players";
+import logger from "../modules/logger";
 
 const router = express.Router();
 
@@ -22,10 +23,10 @@ interface Player {
 
 // GET /teams
 router.get("/", authenticateToken, async (req: Request, res: Response) => {
-  console.log("- accessed GET /teams");
+  logger.info("- accessed GET /teams");
 
   const teams = await Team.findAll();
-  console.log(`- we have ${teams.length} teams`);
+  logger.info(`- we have ${teams.length} teams`);
   res.json({ result: true, teams });
 });
 
@@ -34,10 +35,10 @@ router.post(
   "/create",
   authenticateToken,
   async (req: Request, res: Response) => {
-    console.log("- accessed POST /teams/create");
+    logger.info("- accessed POST /teams/create");
 
     const { teamName, description, playersArray, leagueName } = req.body;
-    console.log(`teamName: ${teamName}`);
+    logger.info(`teamName: ${teamName}`);
 
     const teamNew = await Team.create({
       teamName,
@@ -64,7 +65,7 @@ router.post(
       isAdmin: true,
     });
 
-    console.log(`teamNew: ${JSON.stringify(teamNew)}`);
+    logger.info(`teamNew: ${JSON.stringify(teamNew)}`);
 
     if (playersArray && Array.isArray(playersArray)) {
       for (let i = 0; i < playersArray.length; i++) {
@@ -89,13 +90,13 @@ router.post(
   "/update-visibility",
   authenticateToken,
   async (req: Request, res: Response) => {
-    console.log("- accessed POST /teams/update-visibility");
+    logger.info("- accessed POST /teams/update-visibility");
 
     const { teamId, visibility } = req.body;
-    console.log(`teamId: ${teamId}`);
+    logger.info(`teamId: ${teamId}`);
 
     const team = await Team.findOne({ where: { id: teamId } });
-    // console.log(`team: ${JSON.stringify(team)}`);
+    // logger.info(`team: ${JSON.stringify(team)}`);
 
     if (!team) {
       return res.status(404).json({ result: false, message: "Team not found" });
@@ -112,7 +113,7 @@ router.post(
   "/add-player",
   authenticateToken,
   async (req: Request, res: Response) => {
-    console.log("- accessed POST /teams/add-player");
+    logger.info("- accessed POST /teams/add-player");
 
     const {
       teamId,
@@ -122,7 +123,7 @@ router.post(
       position,
       positionAbbreviation,
     } = req.body;
-    console.log(`teamId: ${teamId}`);
+    logger.info(`teamId: ${teamId}`);
 
     const playerNew = await addNewPlayerToTeam(
       teamId,
@@ -142,10 +143,10 @@ router.delete(
   "/player",
   authenticateToken,
   async (req: Request, res: Response) => {
-    console.log("- accessed DELETE /teams/player");
+    logger.info("- accessed DELETE /teams/player");
 
     const { teamId, playerId } = req.body;
-    console.log(`playerId: ${playerId}`);
+    logger.info(`playerId: ${playerId}`);
 
     await ContractTeamPlayer.destroy({ where: { playerId, teamId } });
 
@@ -158,12 +159,12 @@ router.get(
   "/public",
   authenticateToken,
   async (req: Request, res: Response) => {
-    console.log("- accessed GET /teams/public");
+    logger.info("- accessed GET /teams/public");
 
     const publicTeamsArray = await Team.findAll({
       where: { visibility: "Public" },
     });
-    console.log(`- we have ${publicTeamsArray.length} public teams`);
+    logger.info(`- we have ${publicTeamsArray.length} public teams`);
     res.json({ result: true, publicTeamsArray });
   },
 );

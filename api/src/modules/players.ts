@@ -1,4 +1,5 @@
 import { Player, ContractTeamPlayer } from "@kybervision/db";
+import logger from "../modules/logger";
 
 interface Action {
   playerId: number;
@@ -26,7 +27,7 @@ export async function createUniquePlayerObjArray(
 
     return players; // Return full player objects
   } catch (error: any) {
-    console.error("Error fetching unique player objects:", error);
+    logger.error("Error fetching unique player objects:", error);
     throw new Error("Failed to fetch unique player objects.");
   }
 }
@@ -57,7 +58,7 @@ export async function createUniquePlayerNamesArray(
 
     return uniquePlayerNames;
   } catch (error: any) {
-    console.error("Error fetching unique player names:", error);
+    logger.error("Error fetching unique player names:", error);
     throw new Error("Failed to fetch unique player names.");
   }
 }
@@ -86,7 +87,7 @@ export async function addNewPlayerToTeam(
 
     return { ...playerNew.toJSON(), teamId };
   } catch (error: any) {
-    console.error("Error adding player to team:", error);
+    logger.error("Error adding player to team:", error);
     throw new Error("Failed to add player to team.");
   }
 }

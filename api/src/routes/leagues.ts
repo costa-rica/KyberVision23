@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import { League, ContractLeagueTeam } from "@kybervision/db";
 import { authenticateToken } from "../modules/userAuthentication";
+import logger from "../modules/logger";
 
 const router = express.Router();
 
@@ -47,7 +48,7 @@ router.get(
 
       res.status(200).json({ leaguesArray });
     } catch (error: any) {
-      console.error("❌ Error retrieving leagues:", error);
+      logger.error("❌ Error retrieving leagues:", error);
       res.status(500).json({
         error: "Error retrieving leagues",
         details: error.message,

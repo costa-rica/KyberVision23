@@ -59,7 +59,7 @@ const process = spawn("node", [
 ]);
 
 process.stdout.on("data", (data) => console.log(`Output: ${data}`));
-process.stderr.on("data", (data) => console.error(`Error: ${data}`));
+process.stderr.on("data", (data) => logger.error(`Error: ${data}`));
 ```
 
 ## 🛠 How It Works

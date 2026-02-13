@@ -151,7 +151,7 @@ The Queuer uses a centralized logging approach where ALL output (parent and chil
 
 **Parent Process (server.js:6-14):**
 
-- `console.log` and `console.error` are overridden to add `[NAME_APP]` prefix
+- `logger.info` and `logger.error` are overridden to add `[NAME_APP]` prefix
 - All direct Queuer logs appear as: `[KyberVision23Queuer] message`
 
 **Child Process Logs:**

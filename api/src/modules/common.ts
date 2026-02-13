@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { Ping } from "@kybervision/db";
+import logger from "../modules/logger";
 
 interface ValidationResult {
   isValid: boolean;
@@ -62,12 +63,12 @@ export function writeRequestArgs(
 
       // Write request body to file
       fs.writeFileSync(filePath, JSON.stringify(requestBody, null, 2), "utf8");
-      console.log(`✅ Request arguments saved to: ${filePath}`);
+      logger.info(`✅ Request arguments saved to: ${filePath}`);
     } catch (err: any) {
-      console.error("❌ Error writing request arguments file:", err);
+      logger.error("❌ Error writing request arguments file:", err);
     }
   } else {
-    console.warn(
+    logger.warn(
       "⚠️ PATH_TEST_REQUEST_ARGS is not set, skipping request logging.",
     );
   }
@@ -145,7 +146,7 @@ export async function recordPing(args: {
 
     return { success: true, pingId: (row as any).id };
   } catch (err: any) {
-    console.error("❌ recordPing error:", err?.message || err);
+    logger.error("❌ recordPing error:", err?.message || err);
     return { success: false, error: err?.message || "Unknown error" };
   }
 }

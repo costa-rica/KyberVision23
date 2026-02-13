@@ -4,7 +4,7 @@ import path from "path";
 import archiver from "archiver";
 import { Parser } from "json2csv";
 import { promisify } from "util";
-
+import logger from "../modules/logger";
 import {
   sequelize,
   User,
@@ -61,8 +61,8 @@ interface BackupResult {
 export async function readAndAppendDbTables(
   backupFolderPath: string,
 ): Promise<BackupResult> {
-  console.log(`Processing CSV files from: ${backupFolderPath}`);
-  console.log(`Sequelize instance: ${sequelize}`);
+  logger.info(`Processing CSV files from: ${backupFolderPath}`);
+  logger.info(`Sequelize instance: ${sequelize}`);
   let currentTable: string | null = null;
   try {
     // Read all CSV files from the backup directory
@@ -77,7 +77,7 @@ export async function readAndAppendDbTables(
       appendBatch1.push(file);
     });
 
-    console.log(`Append Batch 1 (First): ${appendBatch1}`);
+    logger.info(`Append Batch 1 (First): ${appendBatch1}`);
 
     // Helper function to process CSV files
     const processCSVFiles = async (files: string[]): Promise<number> => {
@@ -86,11 +86,11 @@ export async function readAndAppendDbTables(
       for (const file of files) {
         const tableName = file.replace(".csv", "");
         if (!models[tableName]) {
-          console.log(`Skipping ${file}, no matching table found.`);
+          logger.info(`Skipping ${file}, no matching table found.`);
           continue;
         }
 
-        console.log(`Importing data into table: ${tableName}`);
+        logger.info(`Importing data into table: ${tableName}`);
         currentTable = tableName;
         const filePath = path.join(backupFolderPath, file);
         const records: any[] = [];
@@ -109,9 +109,9 @@ export async function readAndAppendDbTables(
             ignoreDuplicates: true,
           });
           recordsImported += records.length;
-          console.log(`Imported ${records.length} records into ${tableName}`);
+          logger.info(`Imported ${records.length} records into ${tableName}`);
         } else {
-          console.log(`No records found in ${file}`);
+          logger.info(`No records found in ${file}`);
         }
       }
 
@@ -120,14 +120,14 @@ export async function readAndAppendDbTables(
 
     // 🔹 Disable foreign key constraints before importing
     // ↪This allows us to append when necessary foreign keys are not yet populated.
-    console.log("Disabling foreign key constraints...");
+    logger.info("Disabling foreign key constraints...");
     await sequelize.query("PRAGMA foreign_keys = OFF;");
 
     // Process the batches in order
     totalRecordsImported += await processCSVFiles(appendBatch1); // First batch
 
     // 🔹 Re-enable foreign key constraints after importing
-    console.log("Re-enabling foreign key constraints...");
+    logger.info("Re-enabling foreign key constraints...");
     await sequelize.query("PRAGMA foreign_keys = ON;");
 
     return {
@@ -135,7 +135,7 @@ export async function readAndAppendDbTables(
       message: `Successfully imported ${totalRecordsImported} records.`,
     };
   } catch (error: any) {
-    console.error("Error processing CSV files:", error);
+    logger.error("Error processing CSV files:", error);
 
     // Ensure foreign key constraints are re-enabled even if an error occurs
     await sequelize.query("PRAGMA foreign_keys = ON;");
@@ -151,7 +151,7 @@ export async function readAndAppendDbTables(
 export async function createDatabaseBackupZipFile(
   suffix: string = "",
 ): Promise<string> {
-  console.log(`suffix: ${suffix}`);
+  logger.info(`suffix: ${suffix}`);
   try {
     const timestamp = new Date()
       .toISOString()
@@ -162,13 +162,13 @@ export async function createDatabaseBackupZipFile(
       process.env.PATH_DB_BACKUPS!,
       `db_backup_${timestamp}${suffix}`,
     );
-    console.log(`Backup directory: ${backupDir}`);
+    logger.info(`Backup directory: ${backupDir}`);
     await mkdirAsync(backupDir, { recursive: true });
 
     let hasData = false;
 
     for (const tableName in models) {
-      // console.log(`Processing table: ${tableName}`);
+      // logger.info(`Processing table: ${tableName}`);
       if (models.hasOwnProperty(tableName)) {
         const records = await models[tableName].findAll({ raw: true });
         if (records.length === 0) continue;
@@ -202,7 +202,7 @@ export async function createDatabaseBackupZipFile(
       });
     });
   } catch (error: any) {
-    console.error("Error creating database backup:", error);
+    logger.error("Error creating database backup:", error);
     throw error;
   }
 }

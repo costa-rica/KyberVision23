@@ -2,6 +2,10 @@
 import dotenv from "dotenv";
 dotenv.config();
 
+// Logger must be initialized immediately after dotenv so all subsequent
+// modules can import it as a fully configured singleton.
+import logger from "./modules/logger";
+
 import express from "express";
 import path from "path";
 import cookieParser from "cookie-parser";
@@ -79,15 +83,15 @@ async function initializeApp() {
     // Initialize and sync DB
     initModels();
     await sequelize.sync(); // or { alter: true } while iterating
-    console.log("✅ Database connected & synced");
+    logger.info("✅ Database connected & synced");
 
     // Run startup functions after database is ready
     await onStartUpCreateEnvUsers();
     await onStartUpCreateLeague();
 
-    console.log("✅ App initialization completed");
+    logger.info("✅ App initialization completed");
   } catch (err) {
-    console.error("❌ App initialization failed:", err);
+    logger.error("❌ App initialization failed:", err);
     process.exit(1);
   }
 }
@@ -98,7 +102,7 @@ initializeApp();
 // Start server if this file is run directly (for development)
 if (require.main === module) {
   app.listen(port, () => {
-    console.log(`✅ Development server running on http://localhost:${port}`);
+    logger.info(`✅ Development server running on http://localhost:${port}`);
   });
 }
 

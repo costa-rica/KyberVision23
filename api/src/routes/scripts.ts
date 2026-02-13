@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 import { Action, Script, ContractUserAction, sequelize } from "@kybervision/db";
 import { authenticateToken } from "../modules/userAuthentication";
 import { recordPing } from "../modules/common";
+import logger from "../modules/logger";
 
 const router = express.Router();
 
@@ -32,11 +33,11 @@ router.post(
   "/scripting-live-screen/receive-actions-array",
   authenticateToken,
   async (req: Request, res: Response) => {
-    console.log(
+    logger.info(
       "- accessed POST /scripts/scripting-live-screen/receive-actions-array",
     );
-    // console.log("--- something ---");
-    // console.log(JSON.stringify(req.body));
+    // logger.info("--- something ---");
+    // logger.info(JSON.stringify(req.body));
 
     try {
       const user = req.user;
@@ -51,7 +52,7 @@ router.post(
       } = req.body;
 
       if (userDeviceTimestamp) {
-        // console.log("🚨 Recording ping");
+        // logger.info("🚨 Recording ping");
         const ping = await recordPing({
           userId: user.id,
           serverTimestamp: new Date(),
@@ -59,7 +60,7 @@ router.post(
             "POST /scripts/scripting-live-screen/receive-actions-array",
           userDeviceTimestamp: new Date(userDeviceTimestamp),
         });
-        // console.log(ping);
+        // logger.info(ping);
       }
 
       // Validate input data
@@ -137,8 +138,8 @@ router.post(
         actionsCount: actionsArray.length,
       });
     } catch (error: any) {
-      console.log(error.message);
-      console.error("❌ Error in /receive-actions-array:", error);
+      logger.info(error.message);
+      logger.error("❌ Error in /receive-actions-array:", error);
       res.status(500).json({
         result: false,
         error: "Internal Server Error",

@@ -9,6 +9,7 @@ import {
 import { authenticateToken } from "../modules/userAuthentication";
 import fs from "fs";
 import path from "path";
+import logger from "../modules/logger";
 
 const router = express.Router();
 
@@ -17,7 +18,7 @@ router.get(
   "/team/:teamId",
   authenticateToken,
   async (req: Request, res: Response) => {
-    console.log("- accessed GET /players/team/:teamId");
+    logger.info("- accessed GET /players/team/:teamId");
 
     try {
       const teamId = Number(req.params.teamId);
@@ -67,16 +68,16 @@ router.get(
           playersArrayResponse.push(playerObj);
         });
       } else {
-        console.log(`- no players found`);
+        logger.info(`- no players found`);
       }
 
       // for (let i = 0; i < playersArrayResponse.length; i++) {
-      // 	console.log(playersArrayResponse[i].firstName);
+      // 	logger.info(playersArrayResponse[i].firstName);
       // }
 
       res.json({ result: true, team, playersArray: playersArrayResponse });
     } catch (error: any) {
-      console.error("❌ Error fetching players for team:", error);
+      logger.error("❌ Error fetching players for team:", error);
       res.status(500).json({
         result: false,
         message: "Internal server error",
@@ -93,7 +94,7 @@ router.get(
   async (req: Request, res: Response) => {
     try {
       const filename = req.params.filename;
-      console.log(
+      logger.info(
         `get file from: ${process.env.PATH_PROFILE_PICTURES_PLAYER_DIR}/${filename}`,
       );
 
@@ -114,7 +115,7 @@ router.get(
 
       return res.sendFile(path.resolve(profilePicturePath));
     } catch (error: any) {
-      console.error("❌ Error serving profile picture:", error);
+      logger.error("❌ Error serving profile picture:", error);
       res.status(500).json({
         error: "Error serving profile picture",
         details: error.message,

@@ -22,15 +22,15 @@ If the YouTubeUploader has code like this in its entry point, **remove it**:
 // ❌ REMOVE THIS
 const NAME_APP = process.env.NAME_APP || "SomeServiceName";
 
-console.log = (
+logger.info = (
   (log) => (message) =>
     log(`[${NAME_APP}] ${message}`)
-)(console.log);
+)(logger.info);
 
-console.error = (
+logger.error = (
   (log) => (message) =>
     log(`[${NAME_APP}] ${message}`)
-)(console.error);
+)(logger.error);
 ```
 
 ### 2. Remove Manual Brackets from Error Handlers
@@ -40,44 +40,44 @@ If there are error handlers with manual bracket prefixes, remove the brackets:
 ```javascript
 // ❌ BEFORE (wrong):
 process.on("uncaughtException", (err) => {
-  console.error(`[${NAME_APP}] Uncaught Exception: ${err.message}`);
-  console.error(`[${NAME_APP}] Stack Trace:\n${err.stack}`);
+  logger.error(`[${NAME_APP}] Uncaught Exception: ${err.message}`);
+  logger.error(`[${NAME_APP}] Stack Trace:\n${err.stack}`);
   process.exit(1);
 });
 
 process.on("unhandledRejection", (reason, promise) => {
-  console.error(`[${NAME_APP}] Unhandled Rejection at:`, promise);
-  console.error(`[${NAME_APP}] Reason:`, reason);
+  logger.error(`[${NAME_APP}] Unhandled Rejection at:`, promise);
+  logger.error(`[${NAME_APP}] Reason:`, reason);
 });
 ```
 
 ```javascript
 // ✅ AFTER (correct):
 process.on("uncaughtException", (err) => {
-  console.error(`Uncaught Exception: ${err.message}`);
-  console.error(`Stack Trace:\n${err.stack}`);
+  logger.error(`Uncaught Exception: ${err.message}`);
+  logger.error(`Stack Trace:\n${err.stack}`);
   process.exit(1);
 });
 
 process.on("unhandledRejection", (reason, promise) => {
-  console.error(`Unhandled Rejection at:`, promise);
-  console.error(`Reason:`, reason);
+  logger.error(`Unhandled Rejection at:`, promise);
+  logger.error(`Reason:`, reason);
 });
 ```
 
 ### 3. Use Plain Console Statements
 
-All console.log and console.error calls should be plain, without any manual prefixing:
+All logger.info and logger.error calls should be plain, without any manual prefixing:
 
 ```javascript
 // ✅ CORRECT - No brackets, no prefixes
-console.log("✅ initModels() is called successfully.");
-console.log("YouTubeVideo ID:", res.data.id);
-console.log("KV Video ID:", videoId);
-console.log("✅ Upload completed!");
+logger.info("✅ initModels() is called successfully.");
+logger.info("YouTubeVideo ID:", res.data.id);
+logger.info("KV Video ID:", videoId);
+logger.info("✅ Upload completed!");
 
-console.error("❌ Upload failed:", err.message);
-console.error(err.stack);
+logger.error("❌ Upload failed:", err.message);
+logger.error(err.stack);
 ```
 
 The parent (Queuer) will automatically add:

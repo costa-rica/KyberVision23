@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 import { ContractVideoAction, Action } from "@kybervision/db";
 import { authenticateToken } from "../modules/userAuthentication";
-
+import logger from "../modules/logger";
 const router = express.Router();
 
 // POST /contract-video-actions/scripting-sync-video-screen/update-delta-time-all-actions-in-script
@@ -9,14 +9,14 @@ router.post(
   "/scripting-sync-video-screen/update-delta-time-all-actions-in-script",
   authenticateToken,
   async (req: Request, res: Response) => {
-    console.log(
+    logger.info(
       `- in POST /scripting-sync-video-screen/update-delta-time-all-actions-in-script`,
     );
 
     try {
       const { newDeltaTimeInSeconds, scriptId, videoId } = req.body;
-      console.log(`newDeltaTimeInSeconds: ${newDeltaTimeInSeconds}`);
-      console.log(`scriptId: ${scriptId}, videoId: ${videoId}`);
+      logger.info(`newDeltaTimeInSeconds: ${newDeltaTimeInSeconds}`);
+      logger.info(`scriptId: ${scriptId}, videoId: ${videoId}`);
 
       // Convert parameters to ensure proper types
       const scriptIdNumber = Number(scriptId);
@@ -29,12 +29,12 @@ router.post(
         include: [ContractVideoAction],
       });
 
-      console.log(
+      logger.info(
         `Found ${actionsArray.length} actions for scriptId ${scriptIdNumber}`,
       );
 
       if (!actionsArray || actionsArray.length === 0) {
-        console.log(`❌ 404: No actions found for scriptId ${scriptIdNumber}`);
+        logger.info(`❌ 404: No actions found for scriptId ${scriptIdNumber}`);
         return res.status(404).json({
           result: false,
           message: `Actions not found`,
@@ -43,7 +43,7 @@ router.post(
       }
 
       const actionIds = actionsArray.map((action) => action.id);
-      console.log(`Action IDs: [${actionIds.join(", ")}]`);
+      logger.info(`Action IDs: [${actionIds.join(", ")}]`);
 
       // Get array of ContractVideoActions where actionId is in actionsArray
       const contractVideoActionsArray = await ContractVideoAction.findAll({
@@ -53,12 +53,12 @@ router.post(
         },
       });
 
-      console.log(
+      logger.info(
         `Found ${contractVideoActionsArray.length} ContractVideoActions for videoId ${videoIdNumber}`,
       );
 
       if (contractVideoActionsArray.length === 0) {
-        console.log(
+        logger.info(
           `❌ 404: No ContractVideoActions found for videoId ${videoIdNumber} with actionIds [${actionIds.join(
             ", ",
           )}]`,
@@ -77,7 +77,7 @@ router.post(
         await contractVideoActionsArray[i].save();
       }
 
-      console.log(
+      logger.info(
         `✅ Successfully updated ${contractVideoActionsArray.length} ContractVideoActions with deltaTime ${deltaTimeNumber}`,
       );
 
@@ -88,7 +88,7 @@ router.post(
         updatedCount: contractVideoActionsArray.length,
       });
     } catch (error: any) {
-      console.error("❌ Error updating contract video actions:", error);
+      logger.error("❌ Error updating contract video actions:", error);
       res.status(500).json({
         result: false,
         message: "Internal server error",

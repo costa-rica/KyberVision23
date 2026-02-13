@@ -27,6 +27,7 @@ import fs from "fs";
 import { sendVideoMontageCompleteNotificationEmail } from "../modules/mailer";
 import { writeRequestArgs } from "../modules/common";
 import jwt from "jsonwebtoken";
+import logger from "../modules/logger";
 
 const router = express.Router();
 
@@ -35,7 +36,7 @@ const router = express.Router();
 
 // 🔹 GET /videos/ - Get All Videos with Match Data
 router.get("/", authenticateToken, async (req: Request, res: Response) => {
-  console.log(`- in GET /api/videos`);
+  logger.info(`- in GET /api/videos`);
   const user = req.user;
   try {
     // Fetch all videos with associated match data
@@ -54,7 +55,7 @@ router.get("/", authenticateToken, async (req: Request, res: Response) => {
 
     res.json({ result: true, videosArray: formattedVideos });
   } catch (error: any) {
-    console.error("Error fetching videos:", error);
+    logger.error("Error fetching videos:", error);
     res.status(500).json({
       result: false,
       message: "Internal Server Error",
@@ -68,10 +69,10 @@ router.get(
   "/team/:teamId",
   authenticateToken,
   async (req: Request, res: Response) => {
-    console.log(`- in GET /api/videos/team/:teamId`);
+    logger.info(`- in GET /api/videos/team/:teamId`);
     try {
       const teamId = Number(req.params.teamId);
-      console.log(`teamId: ${teamId}`);
+      logger.info(`teamId: ${teamId}`);
 
       // Fetch videos whose contractTeamUser is associated with the given teamId
       const videosArray = await Video.findAll({
@@ -98,7 +99,7 @@ router.get(
 
       res.json({ result: true, videosArray: formattedVideos });
     } catch (error: any) {
-      console.error("Error fetching videos:", error);
+      logger.error("Error fetching videos:", error);
       res.status(500).json({
         result: false,
         message: "Internal Server Error",
@@ -114,7 +115,7 @@ router.post(
   authenticateToken,
   upload.single("video"),
   async (req: Request, res: Response) => {
-    console.log("- in POST /videos/upload-youtube");
+    logger.info("- in POST /videos/upload-youtube");
 
     // Set timeout for this specific request to 2400 seconds (40 minutes)
     req.setTimeout(2400 * 1000);
@@ -168,7 +169,7 @@ router.post(
       const fileSizeBytes = req.file.size;
       const fileSizeMb = (fileSizeBytes / (1024 * 1024)).toFixed(2);
 
-      console.log(`📁 Video File Size: ${fileSizeMb} MB`);
+      logger.info(`📁 Video File Size: ${fileSizeMb} MB`);
 
       // Step 3: Create video entry with placeholder URL & file size
       const newVideo = await Video.create({
@@ -240,7 +241,7 @@ router.post(
       }
       return res.json({ result: true, message: "All good." });
     } catch (error: any) {
-      console.error("Error in video upload:", error);
+      logger.error("Error in video upload:", error);
       res.status(500).json({
         result: false,
         message: "Internal Server Error",
@@ -264,7 +265,7 @@ router.delete(
         error: errorYouTube,
       } = await deleteVideoFromYouTube(videoId);
 
-      console.log(
+      logger.info(
         `YouTube delete response: ${JSON.stringify({
           successYouTube,
           messageYouTube,
@@ -273,7 +274,7 @@ router.delete(
       );
 
       if (!successYouTube) {
-        console.log("-- No YouTube video to delete");
+        logger.info("-- No YouTube video to delete");
       }
 
       const { success, message, error } = await deleteVideo(videoId);
@@ -284,7 +285,7 @@ router.delete(
 
       res.status(200).json({ message });
     } catch (error: any) {
-      console.error("Error in DELETE /videos/:videoId:", error);
+      logger.error("Error in DELETE /videos/:videoId:", error);
       res.status(500).json({ error: "Internal server error" });
     }
   },
@@ -295,7 +296,7 @@ router.post(
   "/montage-service/queue-a-job",
   authenticateToken,
   async (req: Request, res: Response) => {
-    console.log("Received request to queue a job...");
+    logger.info("Received request to queue a job...");
 
     try {
       const { videoId, actionsArray, token } = req.body;
@@ -335,7 +336,7 @@ router.post(
         });
       }
     } catch (error: any) {
-      console.error("Error queuing montage job:", error);
+      logger.error("Error queuing montage job:", error);
       res.status(500).json({
         result: false,
         message: "Internal Server Error",
@@ -350,7 +351,7 @@ router.post(
   "/montage-service/video-completed-notify-user",
   authenticateToken,
   async (req: Request, res: Response) => {
-    console.log("- in POST /montage-service/video-completed-notify-user");
+    logger.info("- in POST /montage-service/video-completed-notify-user");
 
     try {
       const { filename } = req.body;
@@ -365,8 +366,8 @@ router.post(
           .json({ result: false, message: "User not found" });
       }
 
-      console.log(`filename: ${filename}`);
-      console.log(`userId: ${userId}`);
+      logger.info(`filename: ${filename}`);
+      logger.info(`userId: ${userId}`);
 
       // 🔹 Send email notification
       const tokenizedFilename = tokenizeObject({ filename });
@@ -378,7 +379,7 @@ router.post(
 
       res.json({ result: true, message: "Email sent successfully" });
     } catch (error: any) {
-      console.error("Error in video montage notification:", error);
+      logger.error("Error in video montage notification:", error);
       res.status(500).json({
         result: false,
         message: "Internal Server Error",
@@ -392,14 +393,14 @@ router.post(
 router.get(
   "/montage-service/play-video/:tokenizedMontageFilename",
   (req: Request, res: Response) => {
-    console.log(
+    logger.info(
       "- in GET /montage-service/play-video/:tokenizedMontageFilename",
     );
 
     const { tokenizedMontageFilename } = req.params;
-    console.log("------ Check Token from play-video -----");
-    console.log(tokenizedMontageFilename);
-    console.log("------ ENDCheck Token from play-video -----");
+    logger.info("------ Check Token from play-video -----");
+    logger.info(tokenizedMontageFilename);
+    logger.info("------ ENDCheck Token from play-video -----");
 
     // 🔹 Verify token
     jwt.verify(
@@ -413,13 +414,13 @@ router.get(
         }
 
         const { filename } = decoded; // Extract full path
-        console.log(`📂 Decoded filename: ${filename}`);
+        logger.info(`📂 Decoded filename: ${filename}`);
 
         const videoFilePathAndName = path.join(
           process.env.PATH_VIDEOS_MONTAGE_COMPLETE!,
           filename,
         );
-        console.log(`📂 Video file path: ${videoFilePathAndName}`);
+        logger.info(`📂 Video file path: ${videoFilePathAndName}`);
 
         // 🔹 Check if the file exists
         if (!fs.existsSync(videoFilePathAndName)) {
@@ -431,12 +432,12 @@ router.get(
         // 🔹 Send the file
         res.sendFile(path.resolve(videoFilePathAndName), (err) => {
           if (err) {
-            console.error("❌ Error sending file:", err);
+            logger.error("❌ Error sending file:", err);
             res
               .status(500)
               .json({ result: false, message: "Error sending file" });
           } else {
-            console.log("✅ Video sent successfully");
+            logger.info("✅ Video sent successfully");
           }
         });
       },
@@ -448,7 +449,7 @@ router.get(
 router.get(
   "/montage-service/download-video/:tokenizedMontageFilename",
   (req: Request, res: Response) => {
-    console.log(
+    logger.info(
       "- in GET /montage-service/download-video/:tokenizedMontageFilename",
     );
 
@@ -466,7 +467,7 @@ router.get(
         }
 
         const { filename } = decoded; // Extract full path
-        console.log(`📂 Decoded filename: ${filename}`);
+        logger.info(`📂 Decoded filename: ${filename}`);
 
         const videoFilePathAndName = path.join(
           process.env.PATH_VIDEOS_MONTAGE_COMPLETE!,
@@ -490,14 +491,14 @@ router.get(
         // ✅ **Send File**
         res.sendFile(path.resolve(videoFilePathAndName), (err) => {
           if (err) {
-            console.error("❌ Error sending file:", err);
+            logger.error("❌ Error sending file:", err);
             if (!res.headersSent) {
               res
                 .status(500)
                 .json({ result: false, message: "Error sending file" });
             }
           } else {
-            console.log("✅ Video sent successfully for download");
+            logger.info("✅ Video sent successfully for download");
           }
         });
       },
@@ -533,7 +534,7 @@ router.get("/user", authenticateToken, async (req: Request, res: Response) => {
 
     res.json({ result: true, videosArray: formattedVideos });
   } catch (error: any) {
-    console.error("Error fetching videos:", error);
+    logger.error("Error fetching videos:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
