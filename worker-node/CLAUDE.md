@@ -4,345 +4,164 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-KyberVision23Queuer is an ExpressJS application that manages job queues using BullMQ and Redis for the KyberVision ecosystem. It serves as the central job orchestration service, spawning child processes to handle video processing tasks for connected microservices.
+KyberVision23Queuer is an Express.js TypeScript application that manages job queues using BullMQ and Redis. It serves as the central job orchestration service for the KyberVision ecosystem.
 
-**Version**: 0.22.0
+**YouTube upload** is handled natively inside this service via `src/modules/youtubeUploadService.ts` — no external microservice or child process is required. **Video montage creation** still delegates to an external child process (`KyberVision23VideoMontageMaker`).
 
 ## Development Commands
 
-### Starting the Application
+```bash
+npm run dev    # ts-node + nodemon hot reload
+npm run build  # compile TypeScript to dist/
+npm start      # run compiled output from dist/server.js
+```
+
+Redis must be running before starting the service:
 
 ```bash
-# Start the server (runs on port 8003 by default)
-yarn start
-
-# Start Redis (required dependency)
-# macOS:
-brew services start redis
-
-# Ubuntu:
-sudo systemctl start redis
+brew services start redis   # macOS
+sudo systemctl start redis  # Ubuntu
+redis-cli ping              # verify connection
 ```
 
 ### Redis Management
 
 ```bash
-# Check Redis connection
-redis-cli ping
-
-# Delete all data
-redis-cli FLUSHALL
-
-# Delete specific database
-redis-cli -n 0 FLUSHDB
-
-# Delete specific queue pattern
-redis-cli --raw keys "*KyberVisionVideoUploader03*" | xargs redis-cli del
-
-# Check Redis status (macOS)
-brew services list | grep redis
-
-# Check Redis status (Ubuntu)
-sudo systemctl status redis
+redis-cli FLUSHALL                                              # delete all data
+redis-cli --raw keys "*YouTubeUploadProcess*" | xargs redis-cli del  # flush a specific queue
+brew services list | grep redis                                # check status (macOS)
+sudo systemctl status redis                                    # check status (Ubuntu)
 ```
 
-### Accessing the Dashboard
-
-Bull Board dashboard for monitoring queues and jobs:
+### Bull Board Dashboard
 
 ```
-http://localhost:8003/dashboard
+http://localhost:<PORT>/dashboard
 ```
 
 ### Testing Endpoints
 
 ```bash
 # Queue a YouTube upload job
-curl -X POST http://localhost:8003/youtube-uploader/add \
---header "Content-Type: application/json" \
---data '{"filename": "Video01_trimmed.mp4", "videoId": 123}'
+curl -X POST http://localhost:<PORT>/youtube-uploader/add \
+  --header "Content-Type: application/json" \
+  --data '{"filename": "video.mp4", "videoId": 123}'
 
 # Queue a video montage job
-curl -X POST http://localhost:8003/video-montage-maker/add \
---header "Content-Type: application/json" \
---data '{"filename": "example.mp4", "actionsArray": [], "token": "jwt-token", "user": {}}'
+curl -X POST http://localhost:<PORT>/video-montage-maker/add \
+  --header "Content-Type: application/json" \
+  --data '{"filename": "example.mp4", "actionsArray": [], "token": "jwt-token", "user": {}}'
 ```
 
 ## Architecture
 
-### Application Structure
+### Project Structure
 
 ```
-app.js              # Express app configuration, middleware, and Bull Board setup
-server.js           # Server entry point with error handling and logging overrides
-routes/             # Route handlers for different job types
-  montageVideoMaker.js   # Video montage queue management
-  youtubeUploader.js     # YouTube upload queue management
-  users.js               # User routes
-  index.js               # Route exports
+src/
+├── app.ts                      - Express app, middleware, Bull Board, DB init
+├── server.ts                   - HTTP server startup, process error handlers
+├── modules/
+│   ├── logger.ts               - Winston singleton (import before everything else)
+│   └── youtubeUploadService.ts - Native YouTube upload logic (OAuth2 + DB update)
+└── routes/
+    ├── youtubeUploader.ts      - BullMQ queue + worker for YouTube uploads
+    ├── montageVideoMaker.ts    - BullMQ queue + worker for video montages
+    ├── users.ts                - Placeholder
+    └── index.ts                - Placeholder
 ```
 
-### Job Processing Architecture
+### Job Processing
 
-The application uses a **worker-based queue system** where:
+Two queues are defined. Their names are driven entirely by environment variables.
 
-1. **API Layer (Express)**: Receives job requests and adds them to Redis queues
-2. **Queue Layer (BullMQ)**: Manages job queues with Redis as the backing store
-3. **Worker Layer**: Processes jobs by spawning child processes to external microservices
-4. **Microservice Layer**: External Node.js services that perform the actual work
+| Queue env var | Default name | Worker location | Processing method |
+|---|---|---|---|
+| `YOUTUBE_UPLOADER_QUEUE_NAME` | `YouTubeUploadProcess` | `routes/youtubeUploader.ts` | Direct function call |
+| `NAME_KV_VIDEO_MONTAGE_MAKER_QUEUE` | `KyberVision23VideoMontageMaker` | `routes/montageVideoMaker.ts` | Child process spawn |
 
-### Child Process Pattern
+**Both queues:** `concurrency: 2`, `removeOnComplete: false`, `removeOnFail: false`.
 
-All job workers use a consistent child process spawning pattern:
+### YouTube Upload Worker (`routes/youtubeUploader.ts`)
 
-```javascript
-const child = spawn("node", ["index.js", ...args], {
-  cwd: path.join(process.env.PATH_TO_SERVICE),
+Calls `uploadVideo(filename, videoId)` from `src/modules/youtubeUploadService.ts` directly inside the BullMQ worker processor. No child process is involved.
+
+Progress checkpoints:
+- `10%` — job started
+- `25%` — OAuth2 client configured, upload beginning
+- `100%` — upload complete, DB updated
+
+On error: sets `Video.processingFailed = true` via `@kybervision/db` and re-throws so BullMQ marks the job as failed.
+
+### YouTube Upload Service (`modules/youtubeUploadService.ts`)
+
+`uploadVideo(filename: string, videoId: number): Promise<string>`
+
+1. Resolves file path from `PATH_VIDEOS_UPLOADED + filename`
+2. Creates an OAuth2 client using `YOUTUBE_CLIENT_ID`, `YOUTUBE_CLIENT_SECRET`, `YOUTUBE_REDIRECT_URI`, `YOUTUBE_REFRESH_TOKEN`
+3. Calls `youtube.videos.insert()` — title = filename, privacy = `unlisted`
+4. Updates `Video.youTubeVideoId` and `Video.processingCompleted = true` via `@kybervision/db`
+5. Returns the YouTube video ID string
+
+### Video Montage Worker (`routes/montageVideoMaker.ts`)
+
+Spawns `KyberVision23VideoMontageMaker` as a child process:
+
+```typescript
+spawn("node", ["index.js", filename, JSON.stringify(actionsArray), JSON.stringify(user), token], {
+  cwd: process.env.PATH_TO_VIDEO_MONTAGE_MAKER_SERVICE,
   stdio: ["pipe", "pipe", "pipe"],
 });
 ```
 
-**Key aspects:**
+Progress is updated on each stdout message (5-step tracking). Child stderr is captured and logged.
 
-- `stdio: ["pipe", "pipe", "pipe"]` enables parent-child IPC via stdin, stdout, stderr
-- Progress tracking: stdout messages update job progress and logs in BullMQ
-- Error handling: stderr messages are captured and logged to job
-- Exit codes: Process exit code 0 = success, non-zero = failure
+### Database Initialization
 
-### Queue Configuration
+`initModels()` and `sequelize.sync()` are called in `app.ts` at startup before any routes are registered. This is required for `@kybervision/db` model operations (`Video.findByPk()`, `save()`) to work at runtime.
 
-**Two primary queues:**
+### Logging
 
-1. **KyberVision23VideoMontageMaker** (montageQueue)
-   - Concurrency: 2
-   - Creates video montages from action clips
-   - Spawns: KyberVision23VideoMontageMaker service
+Uses Winston via `src/modules/logger.ts`. The `[NAME_APP]` prefix is applied inside the logger format — no override in `server.ts` (unlike the API). Logger accepts multiple arguments correctly.
 
-2. **KyberVision23YouTubeUploader** (youtubeUploadQueue)
-   - Concurrency: 2
-   - Uploads videos to YouTube
-   - Spawns: KyberVision23YouTubeUploader service
-   - Updates Video table via @kybervision/db package on completion/failure
+- `development` → console only
+- `testing` → console + rotating log files at `PATH_TO_LOGS`
+- `production` → log files only
 
-**Queue settings:**
+Morgan HTTP logging is disabled for `/dashboard` routes.
 
-- `removeOnComplete: false` - Keeps completed jobs for dashboard inspection
-- `removeOnFail: false` - Keeps failed jobs for debugging
-- Progress tracking via `job.updateProgress()` and `job.log()`
+## Environment Variables
 
-### Database Integration
+See `.env.example` for the full list. Key variables:
 
-The application uses the local `@kybervision/db` package (`file:../db-models`) for:
+| Variable | Purpose |
+|---|---|
+| `PORT` | HTTP listen port (default: 8003) |
+| `REDIS_HOST` / `REDIS_PORT` | Redis connection |
+| `PATH_DATABASE` / `NAME_DB` | SQLite database location |
+| `YOUTUBE_UPLOADER_QUEUE_NAME` | YouTube upload queue name (`YouTubeUploadProcess`) |
+| `NAME_KV_VIDEO_MONTAGE_MAKER_QUEUE` | Montage queue name |
+| `YOUTUBE_CLIENT_ID` | Google OAuth2 client ID |
+| `YOUTUBE_CLIENT_SECRET` | Google OAuth2 client secret |
+| `YOUTUBE_REDIRECT_URI` | Google OAuth2 redirect URI |
+| `YOUTUBE_REFRESH_TOKEN` | Long-lived refresh token for YouTube API |
+| `PATH_VIDEOS_UPLOADED` | Directory where uploaded video files are stored |
+| `PATH_TO_VIDEO_MONTAGE_MAKER_SERVICE` | Path to montage maker service directory |
+| `PATH_TO_LOGS` | Winston log file directory |
 
-- Video record lookups and updates (youtubeUploader.js:67-69)
-- Marking videos as `processingFailed` on upload errors
-- Sequelize ORM models with TypeScript definitions
+`PATH_TO_YOUTUBE_UPLOADER_SERVICE` has been removed — YouTube upload runs natively.
 
-Database location controlled by environment variables:
+## Adding a New Queue
 
-- `PATH_DATABASE`: Directory containing the SQLite database
-- `NAME_DB`: Database filename (e.g., kv22.db)
-
-### Logging and Error Handling
-
-**Console Prefixing Architecture:**
-
-The Queuer uses a centralized logging approach where ALL output (parent and child) gets the same `[NAME_APP]` prefix, with origin distinguished by message content:
-
-**Parent Process (server.js:6-14):**
-
-- `logger.info` and `logger.error` are overridden to add `[NAME_APP]` prefix
-- All direct Queuer logs appear as: `[KyberVision23Queuer] message`
-
-**Child Process Logs:**
-
-- Child stdout captured via `child.stdout.on("data")` and logged with "Microservice Output:" marker
-- Child stderr captured via `child.stderr.on("data")` and logged with "Microservice Error:" marker
-- Appears as: `[KyberVision23Queuer] Microservice Output: child message`
-
-**IMPORTANT:** Child microservices (YouTubeUploader, VideoMontageMaker) should NOT override console or add their own prefixes. The parent handles all formatting. See `docs/LOGGING_FIX_INSTRUCTIONS.md` for details.
-
-**Global error handlers** (server.js:17-26):
-
-- `uncaughtException`: Logs stack trace and exits process
-- `unhandledRejection`: Logs promise rejections without exiting
-- Error handlers do NOT manually add brackets (console override handles it)
-
-**Morgan logging** (app.js:25-31):
-
-- Disabled for `/dashboard` routes to reduce noise
-- Uses 'dev' format for all other routes
-
-**Example log output:**
-
-```
-[KyberVision23Queuer] ⚙️ Starting Job ID: 4
-[KyberVision23Queuer] Microservice Output: ✅ initModels() is called successfully.
-[KyberVision23Queuer] Microservice Error: ❌ Upload failed: SQLITE_ERROR
-[KyberVision23Queuer] Microservice exited with code 1
-```
-
-## Environment Configuration
-
-Critical environment variables (see .env.example for full list):
-
-### Core Settings
-
-- `NAME_APP`: Application identifier for logging
-- `PORT`: Server port (default: 8003)
-- `REDIS_HOST`: Redis server host
-- `REDIS_PORT`: Redis server port
-
-### Database
-
-- `PATH_DATABASE`: Path to SQLite database directory
-- `NAME_DB`: Database filename
-
-### Queue Names
-
-- `NAME_KV_VIDEO_MONTAGE_MAKER_QUEUE`: Montage maker queue name
-- `YOUTUBE_UPLOADER_QUEUE_NAME`: YouTube uploader queue name
-
-### Microservice Paths
-
-- `PATH_TO_VIDEO_MONTAGE_MAKER_SERVICE`: Path to video montage maker service
-- `PATH_TO_YOUTUBE_UPLOADER_SERVICE`: Path to YouTube uploader service
-- `PATH_TO_TEST_JOB_SERVICE`: Path to test job service (if used)
-
-### Video Storage Paths
-
-- `PATH_VIDEOS_UPLOADED`: Uploaded session videos
-- `PATH_VIDEOS_MONTAGE_CLIPS`: Montage clip segments
-- `PATH_VIDEOS_MONTAGE_COMPLETE`: Completed montage videos
-
-### YouTube API
-
-- `YOUTUBE_CLIENT_ID`: OAuth client ID
-- `YOUTUBE_CLIENT_SECRET`: OAuth client secret
-- `YOUTUBE_REDIRECT_URI`: OAuth redirect URI
-- `YOUTUBE_REFRESH_TOKEN`: Refresh token for uploads
-
-### API Integration
-
-- `URL_BASE_KV_API`: Base URL for KyberVision API
-- `URL_LOCAL_KV_API_FOR_VIDEO_MONTAGE_MAKER`: Local API endpoint for montage maker
-
-## Key Implementation Details
-
-### YouTube Uploader Worker (routes/youtubeUploader.js)
-
-- Receives jobs with `filename` and `videoId`
-- Spawns child process with CLI args: `--filename <name> --videoId <id>`
-- On stderr events, marks video as failed in database (lines 67-69)
-- Updates Video table via @kybervision/db Sequelize models
-
-### Montage Maker Worker (routes/montageVideoMaker.js)
-
-- Receives jobs with `filename`, `actionsArray`, `token`, and `user`
-- Passes complex data as JSON stringified arguments to child process
-- Uses 5-step progress tracking (totalSteps = 5)
-- Each stdout message increments progress by 20%
-
-### Dynamic Queue Creation (routes/youtubeUploader.js:111-113)
-
-The `/youtube-uploader/add` endpoint supports dynamic queue creation:
-
-```javascript
-const dynamicQueue = new Queue(queueName, { connection: redisConnection });
-```
-
-This allows custom queue names via the `queueName` request parameter, defaulting to `YOUTUBE_UPLOADER_QUEUE_NAME` if not provided.
-
-### Bull Board Integration (app.js:58-70)
-
-- Uses `@bull-board/express` adapter
-- Mounted at `/dashboard` route
-- Must be registered BEFORE other routes to prevent conflicts
-- Monitors both montageQueue and youtubeUploadQueue
-
-## API Routes
-
-### Video Montage Maker
-
-**POST /video-montage-maker/add**
-
-- Body: `{ filename, actionsArray, token, user }`
-- Returns: `{ message, jobId }`
-
-### YouTube Uploader
-
-**POST /youtube-uploader/add**
-
-- Body: `{ filename, videoId, queueName? }`
-- Returns: `{ message, jobId }`
-
-### Users
-
-**Placeholder route** - minimal implementation (routes/users.js)
-
-## Dependencies
-
-- `express` (v5.1.0): Web framework
-- `bullmq` (v5.46.1): Queue management
-- `ioredis` (v5.6.0): Redis client
-- `@bull-board/express` + `@bull-board/api`: Queue monitoring UI
-- `@kybervision/db` (local package): Database models
-- `dotenv`: Environment variable management
-- `morgan`: HTTP request logging
-- `cors`: Cross-origin resource sharing
-- `cookie-parser`: Cookie parsing middleware
-- `ejs`: Template engine (if used)
-
-## Common Development Tasks
-
-### Adding a New Queue
-
-1. Create new route file in `routes/<queueName>.js`
-2. Define queue with Redis connection:
-   ```javascript
-   const newQueue = new Queue("QueueName", { connection: redisConnection });
-   ```
-3. Create worker with job processor function:
-   ```javascript
-   const worker = new Worker("QueueName", async (job) => { ... }, {
-     connection: redisConnection,
-     concurrency: 2
-   });
-   ```
-4. Add queue to Bull Board in `app.js`:
-   ```javascript
-   new BullMQAdapter(newQueue);
-   ```
-5. Register route in `app.js`:
-   ```javascript
-   app.use("/queue-path", newQueueRouter);
-   ```
-
-### Debugging Job Failures
-
-1. Access Bull Board dashboard: `http://localhost:8003/dashboard`
-2. Click on queue name to view jobs
-3. Click on failed job ID to see error messages and logs
-4. Check stderr output in job logs
-5. Review Redis connection if jobs aren't appearing
-6. Check microservice paths in .env are correct
-
-### Modifying Child Process Arguments
-
-When changing arguments passed to child processes:
-
-- Update spawn call in worker function
-- Update corresponding microservice's argument parsing
-- Update README examples for consistency
-- Consider backward compatibility with existing jobs
+1. Create `src/routes/<queueName>.ts`
+2. Define a `Queue` and `Worker` using `redisConnection`
+3. Add the queue to the Bull Board in `src/app.ts` (`new BullMQAdapter(newQueue)`)
+4. Mount the router in `src/app.ts` (`app.use("/path", router)`)
+5. Add the queue name to `.env` and `.env.example`
 
 ## Relationship to KyberVision Ecosystem
 
-This queuer is part of a larger microservices architecture:
-
-- **KyberVision23API**: Main REST API that queues jobs to this service
-- **KyberVision23YouTubeUploader**: Handles YouTube video uploads
-- **KyberVision23VideoMontageMaker**: Creates video montages from action clips
-- **KyberVision23Db**: Shared SQLite database package with Sequelize models
-
-The queuer acts as the orchestration layer, receiving job requests from the API and delegating processing to specialized microservices while providing monitoring via Bull Board.
+- **KyberVision23API** — sends job requests to this service via `URL_KV_JOB_QUEUER`
+- **KyberVision23VideoMontageMaker** — external child process for montage creation (still active)
+- **KyberVision23YouTubeUploader** — decommissioned; functionality now native to this service
+- **@kybervision/db** (`file:../db-models`) — shared Sequelize models; run `npm run build` in `db-models/` after any model changes
