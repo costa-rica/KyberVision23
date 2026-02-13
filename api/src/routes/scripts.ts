@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import { Action, Script, ContractUserAction, sequelize } from "kybervision23db";
+import { Action, Script, ContractUserAction, sequelize } from "@kybervision/db";
 import { authenticateToken } from "../modules/userAuthentication";
 import { recordPing } from "../modules/common";
 

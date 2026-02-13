@@ -6,7 +6,7 @@ import {
   League,
   ContractTeamPlayer,
   ContractPlayerUser,
-} from "kybervision23db";
+} from "@kybervision/db";
 import { authenticateToken } from "../modules/userAuthentication";
 import { addNewPlayerToTeam } from "../modules/players";
 

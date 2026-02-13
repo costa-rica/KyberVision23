@@ -9,7 +9,7 @@ import morgan from "morgan";
 import cors from "cors";
 
 // ⬇️ Import your DB package (use the exact package.json "name" from KyberVision23Db)
-import { initModels, sequelize } from "kybervision23db";
+import { initModels, sequelize } from "@kybervision/db";
 
 // Import onStartUp functions
 import {

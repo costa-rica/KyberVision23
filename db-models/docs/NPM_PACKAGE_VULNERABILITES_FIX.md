@@ -58,7 +58,7 @@ Your `package.json` should look like this:
 
 ```json
 {
-  "name": "kybervision23db",
+  "name": "@kybervision/db",
   ...
   "dependencies": {
     "sequelize": "^6.37.7",

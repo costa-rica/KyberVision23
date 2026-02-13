@@ -5,7 +5,7 @@ import {
   Team,
   ContractPlayerUser,
   User,
-} from "kybervision23db";
+} from "@kybervision/db";
 import { authenticateToken } from "../modules/userAuthentication";
 import fs from "fs";
 import path from "path";

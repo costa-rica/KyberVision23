@@ -25,7 +25,7 @@ import {
   ContractUserAction,
   PendingInvitations,
   Ping,
-} from "kybervision23db";
+} from "@kybervision/db";
 
 const mkdirAsync = promisify(fs.mkdir);
 const writeFileAsync = promisify(fs.writeFile);

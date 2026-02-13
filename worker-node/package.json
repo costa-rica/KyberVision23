@@ -20,7 +20,7 @@
     "ejs": "^3.1.10",
     "express": "^5.1.0",
     "ioredis": "^5.6.0",
-    "kybervision23db": "file:../KyberVision23Db",
+    "@kybervision/db": "file:../db-models",
     "morgan": "^1.10.0"
   }
 }

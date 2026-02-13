@@ -1,4 +1,4 @@
-import { Player, ContractTeamPlayer } from "kybervision23db";
+import { Player, ContractTeamPlayer } from "@kybervision/db";
 
 interface Action {
   playerId: number;

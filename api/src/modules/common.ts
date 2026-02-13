@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { Ping } from "kybervision23db";
+import { Ping } from "@kybervision/db";
 
 interface ValidationResult {
   isValid: boolean;

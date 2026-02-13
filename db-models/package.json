@@ -1,5 +1,5 @@
 {
-  "name": "kybervision23db",
+  "name": "@kybervision/db",
   "version": "20.0.0",
   "description": "Kyber Vision DB models (Sequelize, SQLite) with TypeScript typings",
   "type": "commonjs",

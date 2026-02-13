@@ -25,7 +25,7 @@ import {
   ContractUserAction,
   PendingInvitations,
   Ping,
-} from "kybervision23db";
+} from "@kybervision/db";
 
 import { authenticateToken } from "../modules/userAuthentication";
 import {

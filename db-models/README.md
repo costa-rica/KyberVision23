@@ -10,7 +10,7 @@ A Sequelize SQLite module for the KyberVision23 applications and microservices s
 
 The canonical examples are `User.ts` and `ContractUserAction.ts`. All remaining models should follow the same pattern.
 
-- Package usage: `npm i file:../KyberVision23Db` then `import { initModels } from "kybervision23db";`
+- Package usage: `npm i file:../db-models` then `import { initModels } from "@kybervision/db";`
 - Build before commit: `npm run build` (we commit `dist/`)
 
 If adding a new model, ensure:
@@ -31,7 +31,7 @@ If adding a new model, ensure:
 
 ## import to other apps
 
-`npm i file:../KyberVision23Db`
+`npm i file:../db-models`
 
 ## Environmental Variables
 

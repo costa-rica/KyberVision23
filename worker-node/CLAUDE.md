@@ -122,7 +122,7 @@ const child = spawn("node", ["index.js", ...args], {
    - Concurrency: 2
    - Uploads videos to YouTube
    - Spawns: KyberVision23YouTubeUploader service
-   - Updates Video table via kybervision23db package on completion/failure
+   - Updates Video table via @kybervision/db package on completion/failure
 
 **Queue settings:**
 
@@ -132,7 +132,7 @@ const child = spawn("node", ["index.js", ...args], {
 
 ### Database Integration
 
-The application uses the local `kybervision23db` package (`file:../KyberVision23Db`) for:
+The application uses the local `@kybervision/db` package (`file:../db-models`) for:
 
 - Video record lookups and updates (youtubeUploader.js:67-69)
 - Marking videos as `processingFailed` on upload errors
@@ -234,7 +234,7 @@ Critical environment variables (see .env.example for full list):
 - Receives jobs with `filename` and `videoId`
 - Spawns child process with CLI args: `--filename <name> --videoId <id>`
 - On stderr events, marks video as failed in database (lines 67-69)
-- Updates Video table via kybervision23db Sequelize models
+- Updates Video table via @kybervision/db Sequelize models
 
 ### Montage Maker Worker (routes/montageVideoMaker.js)
 
@@ -286,7 +286,7 @@ This allows custom queue names via the `queueName` request parameter, defaulting
 - `bullmq` (v5.46.1): Queue management
 - `ioredis` (v5.6.0): Redis client
 - `@bull-board/express` + `@bull-board/api`: Queue monitoring UI
-- `kybervision23db` (local package): Database models
+- `@kybervision/db` (local package): Database models
 - `dotenv`: Environment variable management
 - `morgan`: HTTP request logging
 - `cors`: Cross-origin resource sharing

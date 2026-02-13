@@ -12,7 +12,7 @@ import {
   Action,
   ContractVideoAction,
   Script,
-} from "kybervision23db";
+} from "@kybervision/db";
 import { getSessionWithTeams } from "../modules/sessions";
 import {
   upload,

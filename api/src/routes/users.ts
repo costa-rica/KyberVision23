@@ -8,11 +8,11 @@ import {
 } from "../modules/mailer";
 import { authenticateToken } from "../modules/userAuthentication";
 import { deleteVideoFromYouTube, deleteVideo } from "../modules/videos";
-import { Video } from "kybervision23db";
+import { Video } from "@kybervision/db";
 import { recordPing } from "../modules/common";
 
 // Import from the KyberVision23Db package
-import { User, ContractTeamUser, PendingInvitations } from "kybervision23db";
+import { User, ContractTeamUser, PendingInvitations } from "@kybervision/db";
 
 const router = express.Router();
 

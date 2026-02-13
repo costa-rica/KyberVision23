@@ -1,7 +1,7 @@
 import multer from "multer";
 import path from "path";
 import fs from "fs";
-import { Video } from "kybervision23db";
+import { Video } from "@kybervision/db";
 import ffmpeg from "fluent-ffmpeg";
 import axios from "axios";
 import { google } from "googleapis";

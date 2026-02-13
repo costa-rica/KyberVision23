@@ -6,7 +6,7 @@ import {
   ContractTeamPlayer,
   ContractPlayerUser,
   PendingInvitations,
-} from "kybervision23db";
+} from "@kybervision/db";
 import { authenticateToken } from "../modules/userAuthentication";
 import jwt from "jsonwebtoken";
 import { sendJoinSquadNotificationEmail } from "../modules/mailer";

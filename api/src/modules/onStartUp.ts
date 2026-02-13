@@ -1,6 +1,6 @@
 import fs from "fs";
 import bcrypt from "bcrypt";
-import { User, League } from "kybervision23db";
+import { User, League } from "@kybervision/db";
 
 export function verifyCheckDirectoryExists(): void {
   // Add directory paths to check (and create if they don't exist)

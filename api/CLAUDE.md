@@ -15,7 +15,7 @@ This is the KyberVision23 API. The project follows a clean separation between so
 ### Key Dependencies
 
 - **Express.js** - Web framework
-- **KyberVision23Db** - Local database package (file:../KyberVision23Db) providing Sequelize models
+- **KyberVision23Db** - Local database package (file:../db-models) providing Sequelize models
 - **Sequelize** - ORM for database operations with SQLite
 - **TypeScript** - Primary language with ts-node for development
 

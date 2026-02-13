@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import { League, ContractLeagueTeam } from "kybervision23db";
+import { League, ContractLeagueTeam } from "@kybervision/db";
 import { authenticateToken } from "../modules/userAuthentication";
 
 const router = express.Router();

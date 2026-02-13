@@ -1,4 +1,4 @@
-import { ContractLeagueTeam, League, Session, Team } from "kybervision23db";
+import { ContractLeagueTeam, League, Session, Team } from "@kybervision/db";
 
 interface SessionResult {
   success: boolean;

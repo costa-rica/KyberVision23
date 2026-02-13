@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
-import { User } from "kybervision23db";
+import { User } from "@kybervision/db";
 
 // Extend Request interface to include user property
 declare global {

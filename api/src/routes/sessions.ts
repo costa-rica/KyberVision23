@@ -6,7 +6,7 @@ import {
   Session,
   ContractLeagueTeam,
   ContractUserAction,
-} from "kybervision23db";
+} from "@kybervision/db";
 import { authenticateToken } from "../modules/userAuthentication";
 import { createEstimatedTimestampStartOfVideo } from "../modules/contractVideoAction";
 import {
