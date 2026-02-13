@@ -15,6 +15,7 @@ import { createBullBoard } from "@bull-board/api";
 import { BullMQAdapter } from "@bull-board/api/bullMQAdapter";
 import { Queue } from "bullmq";
 import Redis from "ioredis";
+import { initModels, sequelize } from "@kybervision/db";
 
 import usersRouter from "./routes/users";
 import montageVideoMakerRouter from "./routes/montageVideoMaker";
@@ -41,6 +42,12 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json({ limit: "6gb" }));
 app.use(express.urlencoded({ limit: "6gb", extended: true }));
 
+// Initialize database models so all @kybervision/db model operations work at runtime
+initModels();
+sequelize.sync().then(() => {
+  logger.info("✅ Database models initialized and synced");
+});
+
 // Redis Connection
 const redisConnection = new Redis({
   host: process.env.REDIS_HOST || "127.0.0.1",
@@ -54,9 +61,10 @@ const montageQueue = new Queue(
   process.env.NAME_KV_VIDEO_MONTAGE_MAKER_QUEUE as string,
   { connection: redisConnection }
 );
-const youtubeUploadQueue = new Queue("KyberVision23YouTubeUploader", {
-  connection: redisConnection,
-});
+const youtubeUploadQueue = new Queue(
+  process.env.YOUTUBE_UPLOADER_QUEUE_NAME as string,
+  { connection: redisConnection }
+);
 
 // Bull Board setup
 const serverAdapter = new ExpressAdapter();
