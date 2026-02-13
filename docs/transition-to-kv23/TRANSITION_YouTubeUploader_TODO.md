@@ -76,9 +76,9 @@ This is a straightforward migration. The uploader is ~60 lines of active code sp
 
 These are design choices that should be resolved before starting Phase 2:
 
-| # | Question | Default (current KV22 behaviour) |
-|---|---|---|
-| 1 | Should the YouTube video title remain the raw filename? | Yes — filename is used as-is |
-| 2 | Should the privacy status remain `"unlisted"`? | Yes |
-| 3 | Keep the queue name `KyberVision23YouTubeUploader` or rename? | Keep — changing it would orphan any queued jobs in Redis |
-| 4 | Should `youtubeUploadService.ts` live in `modules/` or a new `services/` directory? | `modules/` to stay consistent with existing structure |
+| #   | Question                                                                            | Default (current KV22 behaviour)                         |
+| --- | ----------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| 1   | Should the YouTube video title remain the raw filename?                             | Yes — filename is used as-is                             |
+| 2   | Should the privacy status remain `"unlisted"`?                                      | Yes                                                      |
+| 3   | Keep the queue name `KyberVision23YouTubeUploader` or rename?                       | Keep — changing it would orphan any queued jobs in Redis |
+| 4   | Should `youtubeUploadService.ts` live in `modules/` or a new `services/` directory? | `modules/` to stay consistent with existing structure    |
