@@ -4,61 +4,59 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Development Commands
 
-- `npm run dev` - Start development server with hot reload using nodemon and ts-node
-- `npm run build` - Compile TypeScript to JavaScript (outputs to dist/)
-- `npm start` - Run compiled JavaScript from dist/app.js
+- `npm run dev` - Start development server with hot reload (nodemon + ts-node)
+- `npm run build` - Compile TypeScript to `dist/`
+- `npm start` - Run compiled output from `dist/server.js`
 
 ## Architecture Overview
 
-This is the KyberVision23 API. The project follows a clean separation between source (`src/`) and compiled output (`dist/`) directories.
+Express.js REST API in TypeScript. Entry point is `src/app.ts` (creates and configures the Express app) + `src/server.ts` (starts the HTTP server and sets up process-level error handlers).
 
-### Key Dependencies
+### Bootstrap Sequence
 
-- **Express.js** - Web framework
-- **KyberVision23Db** - Local database package (file:../db-models) providing Sequelize models
-- **Sequelize** - ORM for database operations with SQLite
-- **TypeScript** - Primary language with ts-node for development
+1. `dotenv.config()` then `import logger` — logger must be first
+2. `initModels()` — registers all Sequelize model associations
+3. `sequelize.sync()` — syncs schema to the SQLite database
+4. `verifyCheckDirectoryExists()` — creates required `PATH_*` directories from env
+5. `onStartUpCreateEnvUsers()` / `onStartUpCreateLeague()` — seed defaults
 
 ### Project Structure
 
 ```
 src/
-├── app.ts           - Main application entry point with DB initialization
-├── routes/          - Express route handlers
-│   └── index.ts     - Basic route definitions
-├── modules/         - Business logic modules (currently empty)
-└── templates/       - Email template HTML files
-    ├── registrationConfirmationEmail.html
-    ├── requestToRegisterEmail.html
-    ├── resetPasswordLinkEmail.html
-    └── videoMontageCompleteNotificationEmail.html
+├── app.ts              - Express app configuration, middleware, route mounting
+├── server.ts           - HTTP server start, process error handlers, logger override
+├── routes/             - One file per resource (adminDb, users, teams, sessions, …)
+└── modules/
+    ├── logger.ts       - Winston singleton (import before everything else)
+    ├── userAuthentication.ts - JWT middleware (authenticateToken)
+    ├── onStartUp.ts    - Startup checks and seed functions
+    ├── adminDb.ts      - DB backup/import business logic
+    └── emailService.ts - Nodemailer helpers
 ```
 
-### Database Integration
+### Key Patterns
 
-The API integrates with the KyberVision23Db package which provides:
+**Route file structure**: each route file creates its own `express.Router()` and is mounted in `app.ts` under a prefix (e.g. `/admin-db`, `/teams`).
 
-- Sequelize models for all entities (Users, Teams, Players, Leagues, Sessions, Videos, etc.)
-- Centralized model initialization via `initModels()`
-- Type-safe database operations with TypeScript definitions
-- SQLite database with comprehensive schema for sports team management
+**File uploads**: multer is configured with `dest` pointing to `PATH_PROJECT_RESOURCES/uploads-delete-ok/`. This directory is created on startup by `verifyCheckDirectoryExists`. When wrapping `upload.single()`, always use the explicit callback form to catch multer errors:
+```typescript
+upload.single("fieldName")(req, res, (err) => {
+  if (err) { /* handle */ }
+  next();
+});
+```
 
-Key database entities include core tables (users, teams, players, leagues, sessions, videos, scripts) and contract/relationship tables that manage associations between entities.
+**Logger override in `server.ts`**: `logger.info` and `logger.error` are wrapped to prepend `[NAME_APP]` but only accept **one argument**. Use template literals — never pass an object/Error as a second argument or it will be silently dropped.
 
-- see the docs/DATABASE_OVERVIEW.md for a detailed overview of the database schema.
+**Authentication bypass**: set `AUTHENTIFICATION_TURNED_OFF=true` in `.env` for local development.
 
-### Application Bootstrap
+### Database
 
-The main application (`src/app.ts`) follows this startup sequence:
+- SQLite via Sequelize, models provided by `@kybervision/db` (from `../db-models`)
+- After changing `db-models/` source, run `npm run build` in `db-models/` before restarting the API
+- See `docs/api/` for endpoint documentation and `docs/DATABASE_OVERVIEW.md` for schema reference
 
-1. Load environment variables from `.env`
-2. Initialize database models via `initModels()`
-3. Sync database schema with `sequelize.sync()`
-4. Start Express server on configured port
+### Middleware Ordering Issue
 
-### Development Notes
-
-- The project uses CommonJS modules (not ES modules)
-- Database models are strongly typed using Sequelize TypeScript patterns
-- The codebase maintains references to KyberVision18 for migration context
-- Email templates suggest user registration and video processing workflows
+The `express.json({ limit: "6gb" })` and `express.urlencoded({ limit: "6gb" })` calls in `app.ts` are registered **after** the route mounts and are therefore dead code. Effective body-size configuration must be placed in the initial middleware block (before routes).
