@@ -14,12 +14,12 @@
 - [x] Add a build step to copy montage assets into `worker-node/dist/` (or resolve a runtime path outside `dist/`).
 
 ## Phase 3: Core Montage Logic (Native)
-- [ ] Port `createVideoMontage` to TypeScript module using worker-node logging instead of `console.*`.
-- [ ] Keep clip extraction logic (3s clips with 1.5s pre-roll) and concat file list behavior.
-- [ ] Port watermark step (`addWatermarkToVideo`) and ensure robust file existence checks.
-- [ ] Port `apiPostRequestVideoMontageIsComplete` to use worker-node HTTP client and current env vars.
-- [ ] Remove all `process.exit()` usage; throw errors so BullMQ can mark jobs failed.
-- [ ] Centralize cleanup of montage clips on success and failure.
+- [x] Port `createVideoMontage` to TypeScript module using worker-node logging instead of `console.*`.
+- [x] Keep clip extraction logic (3s clips with 1.5s pre-roll) and concat file list behavior.
+- [x] Port watermark step (`addWatermarkToVideo`) and ensure robust file existence checks.
+- [x] Port `apiPostRequestVideoMontageIsComplete` to use worker-node HTTP client and current env vars.
+- [x] Remove all `process.exit()` usage; throw errors so BullMQ can mark jobs failed.
+- [x] Centralize cleanup of montage clips on success and failure.
 
 ## Phase 4: Worker Integration
 - [ ] Replace child process spawn in `worker-node/src/routes/montageVideoMaker.ts` with a direct function call.
