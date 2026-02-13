@@ -17,13 +17,13 @@ The project also used a KyberVision22Queuer which is an ExpressJS application th
 | database/             | KyberVision22Db      |
 | worker-node/          | KyberVision22Queuer  |
 
-### worker-node future implementation
+### worker-node implementation
 
-KyberVision22VideoMontageMaker will be absorbed into the worker-node/ project. The KyberVision22YouTubeUploader has already been fully absorbed into the worker-node/ project.
+KyberVision22VideoMontageMaker has been absorbed into the worker-node/ project. The KyberVision22YouTubeUploader has already been fully absorbed into the worker-node/ project.
 
 ## Migrating KyberVision22Queuer
 
-The KyberVision22Queuer is now moved to the worker-node/ subproject directory. It is will be its own service that will instead of running the child processes, we will want to migrate the KyberVision22VideoMontageMaker into the worker-node/ subproject directory as well. The worker-node/ will be an API / BullMQ service that will queue the jobs and process the functionalities that KyberVision22VideoMontageMaker and KyberVision22YouTubeUploader were doing a child processes.
+The KyberVision22Queuer is now moved to the worker-node/ subproject directory. It is its own service and no longer runs child processes for montage creation or YouTube uploads. The worker-node/ is an API / BullMQ service that queues jobs and processes the functionalities that KyberVision22VideoMontageMaker and KyberVision22YouTubeUploader previously handled as child processes.
 
 ### KyberVision22VideoMontageMaker
 

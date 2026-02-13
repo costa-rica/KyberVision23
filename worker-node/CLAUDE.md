@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 KyberVision23Queuer is an Express.js TypeScript application that manages job queues using BullMQ and Redis. It serves as the central job orchestration service for the KyberVision ecosystem.
 
-**YouTube upload** is handled natively inside this service via `src/modules/youtubeUploadService.ts` — no external microservice or child process is required. **Video montage creation** still delegates to an external child process (`KyberVision23VideoMontageMaker`).
+**YouTube upload** is handled natively inside this service via `src/modules/youtubeUploadService.ts` — no external microservice or child process is required. **Video montage creation** is handled natively inside this service via `src/modules/videoMontageService.ts`.
 
 ## Development Commands
 
@@ -63,7 +63,9 @@ src/
 ├── server.ts                   - HTTP server startup, process error handlers
 ├── modules/
 │   ├── logger.ts               - Winston singleton (import before everything else)
-│   └── youtubeUploadService.ts - Native YouTube upload logic (OAuth2 + DB update)
+│   ├── youtubeUploadService.ts - Native YouTube upload logic (OAuth2 + DB update)
+│   ├── videoMontageService.ts  - Native montage creation logic (ffmpeg + watermark)
+│   └── videoMontageApi.ts      - Montage completion callback to API
 └── routes/
     ├── youtubeUploader.ts      - BullMQ queue + worker for YouTube uploads
     ├── montageVideoMaker.ts    - BullMQ queue + worker for video montages
@@ -78,7 +80,7 @@ Two queues are defined. Their names are driven entirely by environment variables
 | Queue env var | Default name | Worker location | Processing method |
 |---|---|---|---|
 | `YOUTUBE_UPLOADER_QUEUE_NAME` | `YouTubeUploadProcess` | `routes/youtubeUploader.ts` | Direct function call |
-| `NAME_KV_VIDEO_MONTAGE_MAKER_QUEUE` | `KyberVision23VideoMontageMaker` | `routes/montageVideoMaker.ts` | Child process spawn |
+| `NAME_KV_VIDEO_MONTAGE_MAKER_QUEUE` | `KyberVision23VideoMontageMaker` | `routes/montageVideoMaker.ts` | Direct function call |
 
 **Both queues:** `concurrency: 2`, `removeOnComplete: false`, `removeOnFail: false`.
 
@@ -105,16 +107,14 @@ On error: sets `Video.processingFailed = true` via `@kybervision/db` and re-thro
 
 ### Video Montage Worker (`routes/montageVideoMaker.ts`)
 
-Spawns `KyberVision23VideoMontageMaker` as a child process:
+Calls `createVideoMontage(...)` from `src/modules/videoMontageService.ts` directly inside the BullMQ worker processor.
 
-```typescript
-spawn("node", ["index.js", filename, JSON.stringify(actionsArray), JSON.stringify(user), token], {
-  cwd: process.env.PATH_TO_VIDEO_MONTAGE_MAKER_SERVICE,
-  stdio: ["pipe", "pipe", "pipe"],
-});
-```
-
-Progress is updated on each stdout message (5-step tracking). Child stderr is captured and logged.
+Progress checkpoints:
+- `10%` — starting clip extraction
+- `45%` — clip extraction complete
+- `70%` — montage merge complete
+- `85%` — watermark applied
+- `100%` — montage creation complete (API notified)
 
 ### Database Initialization
 
@@ -146,10 +146,13 @@ See `.env.example` for the full list. Key variables:
 | `YOUTUBE_REDIRECT_URI` | Google OAuth2 redirect URI |
 | `YOUTUBE_REFRESH_TOKEN` | Long-lived refresh token for YouTube API |
 | `PATH_VIDEOS_UPLOADED` | Directory where uploaded video files are stored |
-| `PATH_TO_VIDEO_MONTAGE_MAKER_SERVICE` | Path to montage maker service directory |
+| `PATH_VIDEOS_MONTAGE_CLIPS` | Temp clip output directory for montage creation |
+| `PATH_VIDEOS_MONTAGE_COMPLETE` | Final montage output directory |
+| `URL_LOCAL_KV_API_FOR_VIDEO_MONTAGE_MAKER` | API base URL used for montage completion callback |
 | `PATH_TO_LOGS` | Winston log file directory |
 
 `PATH_TO_YOUTUBE_UPLOADER_SERVICE` has been removed — YouTube upload runs natively.
+`PATH_TO_VIDEO_MONTAGE_MAKER_SERVICE` has been removed — montage creation runs natively.
 
 ## Adding a New Queue
 
@@ -162,6 +165,6 @@ See `.env.example` for the full list. Key variables:
 ## Relationship to KyberVision Ecosystem
 
 - **KyberVision23API** — sends job requests to this service via `URL_KV_JOB_QUEUER`
-- **KyberVision23VideoMontageMaker** — external child process for montage creation (still active)
+- **KyberVision23VideoMontageMaker** — decommissioned; functionality now native to this service
 - **KyberVision23YouTubeUploader** — decommissioned; functionality now native to this service
 - **@kybervision/db** (`file:../db-models`) — shared Sequelize models; run `npm run build` in `db-models/` after any model changes

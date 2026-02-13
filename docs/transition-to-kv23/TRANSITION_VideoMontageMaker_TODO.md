@@ -28,7 +28,7 @@
 - [x] Remove references to `PATH_TO_VIDEO_MONTAGE_MAKER_SERVICE` from montage worker logic.
 
 ## Phase 5: Configuration and Docs
-- [ ] Update `worker-node/.env.example` to remove `PATH_TO_VIDEO_MONTAGE_MAKER_SERVICE` and document any new vars.
-- [ ] Update `worker-node/CLAUDE.md` to describe native montage processing (no child process).
-- [ ] Update `docs/PROJECT_OVERVIEW.md` to reflect montage maker absorption into worker-node.
-- [ ] Add migration notes to `docs/transition-to-kv23` if operational changes are required (ffmpeg install, assets).
+- [x] Update `worker-node/.env.example` to remove `PATH_TO_VIDEO_MONTAGE_MAKER_SERVICE` and document any new vars.
+- [x] Update `worker-node/CLAUDE.md` to describe native montage processing (no child process).
+- [x] Update `docs/PROJECT_OVERVIEW.md` to reflect montage maker absorption into worker-node.
+- [x] Add migration notes to `docs/transition-to-kv23` if operational changes are required (ffmpeg install, assets).
