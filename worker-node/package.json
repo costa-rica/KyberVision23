@@ -1,10 +1,12 @@
 {
   "name": "kybervision23queuer",
   "version": "1.0.0",
-  "main": "app.js",
+  "main": "dist/app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "dev": "nodemon --watch src --exec ts-node src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
@@ -13,6 +15,7 @@
   "dependencies": {
     "@bull-board/api": "^6.7.10",
     "@bull-board/express": "^6.7.10",
+    "@kybervision/db": "file:../db-models",
     "bullmq": "^5.46.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
@@ -20,7 +23,18 @@
     "ejs": "^3.1.10",
     "express": "^5.1.0",
     "ioredis": "^5.6.0",
-    "@kybervision/db": "file:../db-models",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "winston": "^3.19.0"
+  },
+  "devDependencies": {
+    "@types/cookie-parser": "^1.4.10",
+    "@types/cors": "^2.8.19",
+    "@types/ejs": "^3.1.5",
+    "@types/express": "^5.0.6",
+    "@types/morgan": "^1.9.10",
+    "@types/node": "^25.2.3",
+    "nodemon": "^3.1.11",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
   }
 }

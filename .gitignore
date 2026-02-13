@@ -16,5 +16,9 @@ dist/
 build/
 .next/
 
+# Logs
+_logs/
+*.log
+
 # IDE
 .vscode/
