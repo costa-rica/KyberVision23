@@ -45,11 +45,11 @@ This is a straightforward migration. The uploader is ~60 lines of active code sp
 
 ## Phase 4 — Environment Variable Cleanup
 
-- [ ] Remove `PATH_TO_YOUTUBE_UPLOADER_SERVICE` from `worker-node/.env`
-- [ ] Remove `PATH_TO_YOUTUBE_UPLOADER_SERVICE` from `worker-node/.env.example`
-- [ ] Update `YOUTUBE_UPLOADER_QUEUE_NAME` to `YouTubeUploadProcess` in `worker-node/.env` and `worker-node/.env.example`
-- [ ] Update `YOUTUBE_UPLOADER_QUEUE_NAME` to `YouTubeUploadProcess` in `api/.env` and `api/.env.example` (if present) so the API sends jobs to the renamed queue
-- [ ] Add a comment in `.env.example` noting that `YOUTUBE_*` variables are now consumed directly by worker-node (no longer passed to an external process)
+- [x] Remove `PATH_TO_YOUTUBE_UPLOADER_SERVICE` from `worker-node/.env`
+- [x] Remove `PATH_TO_YOUTUBE_UPLOADER_SERVICE` from `worker-node/.env.example`
+- [x] Update `YOUTUBE_UPLOADER_QUEUE_NAME` to `YouTubeUploadProcess` in `worker-node/.env` and `worker-node/.env.example`
+- [x] Update `YOUTUBE_UPLOADER_QUEUE_NAME` to `YouTubeUploadProcess` in `api/.env` and `api/.env.example` (if present) so the API sends jobs to the renamed queue
+- [x] Add a comment in `.env.example` noting that `YOUTUBE_*` variables are now consumed directly by worker-node (no longer passed to an external process)
 
 ---
 
