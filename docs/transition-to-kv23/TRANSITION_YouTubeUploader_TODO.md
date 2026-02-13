@@ -33,13 +33,13 @@ This is a straightforward migration. The uploader is ~60 lines of active code sp
 
 ## Phase 3 — Update the BullMQ Worker
 
-- [ ] Open `worker-node/src/routes/youtubeUploader.ts`
-- [ ] Remove the `child_process.spawn` import and the entire child process block from the `Worker` processor function
-- [ ] Remove the `path` import (no longer needed for service directory resolution)
-- [ ] Import and call `uploadVideo` from `../modules/youtubeUploadService` directly inside the worker processor
-- [ ] Replace stdout-based progress updates (which were driven by child process output) with explicit `job.updateProgress()` calls at meaningful points in the upload lifecycle (e.g., 25% after OAuth setup, 75% after upload completes, 100% after DB update)
-- [ ] Replace stderr-based `processingFailed` DB updates with a try/catch around the `uploadVideo()` call — set `processingFailed = true` on the Video record in the catch block
-- [ ] Add `job.log()` calls at key steps to preserve visibility in the Bull Board dashboard
+- [x] Open `worker-node/src/routes/youtubeUploader.ts`
+- [x] Remove the `child_process.spawn` import and the entire child process block from the `Worker` processor function
+- [x] Remove the `path` import (no longer needed for service directory resolution)
+- [x] Import and call `uploadVideo` from `../modules/youtubeUploadService` directly inside the worker processor
+- [x] Replace stdout-based progress updates (which were driven by child process output) with explicit `job.updateProgress()` calls at meaningful points in the upload lifecycle (e.g., 25% after OAuth setup, 75% after upload completes, 100% after DB update)
+- [x] Replace stderr-based `processingFailed` DB updates with a try/catch around the `uploadVideo()` call — set `processingFailed = true` on the Video record in the catch block
+- [x] Add `job.log()` calls at key steps to preserve visibility in the Bull Board dashboard
 
 ---
 

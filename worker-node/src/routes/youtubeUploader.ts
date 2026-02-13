@@ -1,12 +1,13 @@
 import express, { Request, Response } from "express";
 import { Queue, Worker, Job } from "bullmq";
 import Redis from "ioredis";
-import path from "path";
-import { spawn } from "child_process";
 import { Video } from "@kybervision/db";
 import logger from "../modules/logger";
+import { uploadVideo } from "../modules/youtubeUploadService";
 
 const router = express.Router();
+
+const QUEUE_NAME = process.env.YOUTUBE_UPLOADER_QUEUE_NAME as string;
 
 const redisConnection = new Redis({
   host: process.env.REDIS_HOST || "127.0.0.1",
@@ -16,65 +17,43 @@ const redisConnection = new Redis({
 });
 
 // Define the queue
-const youtubeUploadQueue = new Queue(
-  process.env.YOUTUBE_UPLOADER_QUEUE_NAME as string,
-  { connection: redisConnection }
-);
+const youtubeUploadQueue = new Queue(QUEUE_NAME, { connection: redisConnection });
 
 // Create a worker to process jobs from the queue
 const worker = new Worker(
-  process.env.YOUTUBE_UPLOADER_QUEUE_NAME as string,
+  QUEUE_NAME,
   async (job: Job) => {
-    logger.info(`⚙️ Starting Job ID: ${job.id}`);
-
     const { filename, videoId } = job.data;
 
-    logger.info("--- New Logging ---");
+    logger.info(`⚙️ Starting YouTube upload job ID: ${job.id}`);
     logger.info(`filename: ${filename}`);
     logger.info(`videoId: ${videoId}`);
 
-    const child = spawn(
-      "node",
-      ["index.js", "--filename", filename, "--videoId", videoId],
-      {
-        cwd: path.join(process.env.PATH_TO_YOUTUBE_UPLOADER_SERVICE as string),
-        stdio: ["pipe", "pipe", "pipe"],
-      }
-    );
+    await job.updateProgress(10);
+    await job.log(`Job started — file: ${filename}, videoId: ${videoId}`);
 
-    let progress = 0;
-    const totalSteps = 5;
+    try {
+      await job.updateProgress(25);
+      await job.log("OAuth2 client configured, beginning upload");
 
-    child.stdout.on("data", async (data: Buffer) => {
-      const message = data.toString().trim();
-      logger.info(`Microservice Output: ${message}`);
-      if (message) {
-        progress += 1;
-        await job.updateProgress((progress / totalSteps) * 100);
-        await job.log(message);
-      }
-    });
+      const youTubeVideoId = await uploadVideo(filename, videoId);
 
-    child.stderr.on("data", async (data: Buffer) => {
-      logger.error(`Microservice Error: ${data}`);
+      await job.updateProgress(100);
+      await job.log(`Upload complete — YouTube video ID: ${youTubeVideoId}`);
+
+      return { success: true, youTubeVideoId };
+    } catch (err: any) {
+      logger.error(`Upload failed for videoId ${videoId}: ${err.message}`);
+      await job.log(`Upload failed: ${err.message}`);
+
       const uploadedVideo = await Video.findByPk(videoId);
       if (uploadedVideo) {
         uploadedVideo.processingFailed = true;
         await uploadedVideo.save();
       }
-      await job.log(`Microservice Error: ${data}`);
-    });
 
-    return new Promise<{ success: boolean }>((resolve, reject) => {
-      child.on("close", (code: number | null) => {
-        logger.info(`Microservice exited with code ${code}`);
-        if (code === 0) {
-          resolve({ success: true });
-        } else {
-          reject(new Error(`Microservice failed with code ${code}`));
-        }
-      });
-    });
+      throw err;
+    }
   },
   {
     connection: redisConnection,
@@ -97,7 +76,7 @@ router.post("/add", async (req: Request, res: Response) => {
 
     if (!queueName) {
       logger.error("- No queue name provided, assigning default name");
-      queueName = process.env.YOUTUBE_UPLOADER_QUEUE_NAME;
+      queueName = QUEUE_NAME;
     }
 
     logger.info(`Adding job to queue: ${queueName}`);
@@ -116,7 +95,7 @@ router.post("/add", async (req: Request, res: Response) => {
     logger.info(`Job added to queue '${queueName}' with ID: ${job.id}`);
     res.status(200).json({ message: "Job triggered successfully!", jobId: job.id });
   } catch (error: any) {
-    logger.error("❌ Error triggering job:", error.message);
+    logger.error(`❌ Error triggering job: ${error.message}`);
     res.status(500).json({ error: "Error triggering job" });
   }
 });
