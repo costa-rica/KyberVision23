@@ -10,24 +10,24 @@ This is a straightforward migration. The uploader is ~60 lines of active code sp
 
 ## Phase 1 — Audit & Preparation
 
-- [ ] Confirm the `Video` model in `@kybervision/db` has the same field names used by the uploader: `youTubeVideoId`, `processingCompleted`, `processingFailed`
-- [ ] Confirm `initModels()` is called at worker-node startup — it is **not** currently called anywhere in `worker-node/src/`. Add it to `worker-node/src/app.ts` alongside `sequelize.sync()` (mirroring the pattern in `api/src/app.ts`), otherwise `Video.findByPk()` will fail at runtime
-- [ ] Add `googleapis` to `worker-node/package.json` dependencies (`npm install googleapis`)
-- [ ] Verify the YouTube OAuth env vars already present in `worker-node/.env` are correct and still valid: `YOUTUBE_CLIENT_ID`, `YOUTUBE_CLIENT_SECRET`, `YOUTUBE_REDIRECT_URI`, `YOUTUBE_REFRESH_TOKEN`
-- [ ] Note any design decisions that need to be made before implementation (see Decision Points section below)
+- [x] Confirm the `Video` model in `@kybervision/db` has the same field names used by the uploader: `youTubeVideoId`, `processingCompleted`, `processingFailed`
+- [x] Confirm `initModels()` is called at worker-node startup — it is **not** currently called anywhere in `worker-node/src/`. Add it to `worker-node/src/app.ts` alongside `sequelize.sync()` (mirroring the pattern in `api/src/app.ts`), otherwise `Video.findByPk()` will fail at runtime
+- [x] Add `googleapis` to `worker-node/package.json` dependencies (`npm install googleapis`)
+- [x] Verify the YouTube OAuth env vars already present in `worker-node/.env` are correct and still valid: `YOUTUBE_CLIENT_ID`, `YOUTUBE_CLIENT_SECRET`, `YOUTUBE_REDIRECT_URI`, `YOUTUBE_REFRESH_TOKEN`
+- [x] Note any design decisions that need to be made before implementation (see Decision Points section below)
 
 ---
 
 ## Phase 2 — Port Upload Logic to TypeScript
 
-- [ ] Create `worker-node/src/modules/youtubeUploadService.ts`
-- [ ] Port the `uploadVideo(filePath, videoId)` function from `KyberVision22YouTubeUploader/modules/uploader.js` to TypeScript
-- [ ] Replace `require("kybervision22db")` with `import { Video } from "@kybervision/db"`
-- [ ] Remove the `initModels()` call from inside the upload function — it will be handled at app startup (Phase 1)
-- [ ] Remove the unused `fileSize` variable (`fs.statSync(filePath).size` is computed but never used in the original)
-- [ ] Add explicit TypeScript types for function parameters (`filePath: string`, `videoId: number`) and return type (`Promise<string>` returning the YouTube video ID)
-- [ ] Update the hardcoded video description from `"Uploaded by KyberVision22YouTubeUploader"` to `"Uploaded by KyberVision23"`
-- [ ] Ensure thrown errors propagate correctly so the BullMQ worker can catch and mark the job as failed
+- [x] Create `worker-node/src/modules/youtubeUploadService.ts`
+- [x] Port the `uploadVideo(filePath, videoId)` function from `KyberVision22YouTubeUploader/modules/uploader.js` to TypeScript
+- [x] Replace `require("kybervision22db")` with `import { Video } from "@kybervision/db"`
+- [x] Remove the `initModels()` call from inside the upload function — it will be handled at app startup (Phase 1)
+- [x] Remove the unused `fileSize` variable (`fs.statSync(filePath).size` is computed but never used in the original)
+- [x] Add explicit TypeScript types for function parameters (`filePath: string`, `videoId: number`) and return type (`Promise<string>` returning the YouTube video ID)
+- [x] Update the hardcoded video description from `"Uploaded by KyberVision22YouTubeUploader"` to `"Uploaded by KyberVision23"`
+- [x] Ensure thrown errors propagate correctly so the BullMQ worker can catch and mark the job as failed
 
 ---
 
@@ -47,6 +47,8 @@ This is a straightforward migration. The uploader is ~60 lines of active code sp
 
 - [ ] Remove `PATH_TO_YOUTUBE_UPLOADER_SERVICE` from `worker-node/.env`
 - [ ] Remove `PATH_TO_YOUTUBE_UPLOADER_SERVICE` from `worker-node/.env.example`
+- [ ] Update `YOUTUBE_UPLOADER_QUEUE_NAME` to `YouTubeUploadProcess` in `worker-node/.env` and `worker-node/.env.example`
+- [ ] Update `YOUTUBE_UPLOADER_QUEUE_NAME` to `YouTubeUploadProcess` in `api/.env` and `api/.env.example` (if present) so the API sends jobs to the renamed queue
 - [ ] Add a comment in `.env.example` noting that `YOUTUBE_*` variables are now consumed directly by worker-node (no longer passed to an external process)
 
 ---
@@ -54,7 +56,7 @@ This is a straightforward migration. The uploader is ~60 lines of active code sp
 ## Phase 5 — Testing
 
 - [ ] Run `npm run build` in `worker-node/` and confirm zero TypeScript errors
-- [ ] Start worker-node and verify the Bull Board dashboard loads at `http://localhost:8003/dashboard` and the `KyberVision23YouTubeUploader` queue appears
+- [ ] Start worker-node and verify the Bull Board dashboard loads at `http://localhost:8003/dashboard` and the `YouTubeUploadProcess` queue appears
 - [ ] Submit a test job via `POST /youtube-uploader/add` with a valid `filename` and `videoId` and confirm the job reaches `active` state in the dashboard
 - [ ] Confirm the video file is uploaded to YouTube (check YouTube Studio)
 - [ ] Confirm the `Video` database record is updated with a non-null `youTubeVideoId` and `processingCompleted = true`
@@ -74,11 +76,11 @@ This is a straightforward migration. The uploader is ~60 lines of active code sp
 
 ## Decision Points
 
-These are design choices that should be resolved before starting Phase 2:
+These are design choices resolved before implementation:
 
-| #   | Question                                                                            | Default (current KV22 behaviour)                         |
+| #   | Question                                                                            | Decision                                                 |
 | --- | ----------------------------------------------------------------------------------- | -------------------------------------------------------- |
 | 1   | Should the YouTube video title remain the raw filename?                             | Yes — filename is used as-is                             |
 | 2   | Should the privacy status remain `"unlisted"`?                                      | Yes                                                      |
-| 3   | Keep the queue name `KyberVision23YouTubeUploader` or rename?                       | Keep — changing it would orphan any queued jobs in Redis |
+| 3   | Keep the queue name `KyberVision23YouTubeUploader` or rename?                       | Rename to `YouTubeUploadProcess`                         |
 | 4   | Should `youtubeUploadService.ts` live in `modules/` or a new `services/` directory? | `modules/` to stay consistent with existing structure    |
