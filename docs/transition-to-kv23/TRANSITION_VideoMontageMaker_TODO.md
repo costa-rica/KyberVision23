@@ -8,10 +8,10 @@
 - [x] Decide where the watermark asset will live inside worker-node and how it is packaged for `dist/`.
 
 ## Phase 2: Dependency and Asset Migration
-- [ ] Add `axios` and `fluent-ffmpeg` to `worker-node/package.json` dependencies.
-- [ ] Add any required type packages or ambient typings for `fluent-ffmpeg` if needed.
-- [ ] Copy watermark image into worker-node (e.g., `worker-node/assets/KyberV2Shiny.png`).
-- [ ] Add a build step to copy montage assets into `worker-node/dist/` (or resolve a runtime path outside `dist/`).
+- [x] Add `axios` and `fluent-ffmpeg` to `worker-node/package.json` dependencies.
+- [x] Add any required type packages or ambient typings for `fluent-ffmpeg` if needed.
+- [x] Copy watermark image into worker-node (e.g., `worker-node/assets/KyberV2Shiny.png`).
+- [x] Add a build step to copy montage assets into `worker-node/dist/` (or resolve a runtime path outside `dist/`).
 
 ## Phase 3: Core Montage Logic (Native)
 - [ ] Port `createVideoMontage` to TypeScript module using worker-node logging instead of `console.*`.
