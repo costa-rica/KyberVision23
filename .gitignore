@@ -24,3 +24,6 @@ _logs/
 
 # IDE
 .vscode/
+
+# Documents
+mobile/docs/google-credentials

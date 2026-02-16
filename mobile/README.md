@@ -114,12 +114,29 @@ The app is built using React Native and Expo and TypeScript. Volley ball trainin
 └── tsconfig.json
 ```
 
-## Kyber Vision Mobile 22 TypeScript Documentation
+## EAS Build
 
-- [Project Overview](../docs/PROJECT_OVERVIEW.md)
-  - [API Reference](../docs/API_REFERENCE.md)
-  - [Database Overview](../docs/DATABASE_OVERVIEW.md)
+### For builds that can be installed on a device (no npm start)
 
-## Google Sign In
+#### 1. fix eas.json
 
-For example see the [kyber-vision-mobile-12 github repo](https://github.com/costa-rica/kyber-vision-mobile-12) specifically the splash screen
+```json
+		"preview": {
+			"channel": "preview",
+			"distribution": "internal",
+			"ios": { "distribution": "internal" },
+			"android": { "buildType": "apk" }
+		},
+```
+
+#### 2. eas build --profile preview
+
+### ios
+
+Register device: https://expo.dev/register-device/107c6cfd-b02e-445a-8025-eff3e931050f
+
+## Google Auth fields
+
+Web App: mobile/docs/google-credentials/client_secret_572642369359-a521vfajfri9c7u92fhoc2k6fo7vq4hp.apps.googleusercontent.com.json
+Android: mobile/docs/google-credentials/client_secret_572642369359-k7f9pe5gnc0flk20l1ko3bta0fh8cl41.apps.googleusercontent.com.json
+iOS: mobile/docs/google-credentials/client_572642369359-5clos44hddg7afhkrgconc0anm878svd.apps.googleusercontent.com.plist
