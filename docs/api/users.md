@@ -20,6 +20,19 @@ Creates a new user account and handles invitation processing.
 }
 ```
 
+**Example:**
+
+```bash
+curl -X POST http://localhost:3000/users/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "firstName": "Jane",
+    "lastName": "Smith",
+    "email": "jane.smith@example.com",
+    "password": "securepassword"
+  }'
+```
+
 **Response:**
 
 ```json
@@ -65,6 +78,25 @@ Authenticates a user and returns a JWT token.
 }
 ```
 
+**Example:**
+
+```bash
+curl -X POST http://localhost:3000/users/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "jane.smith@example.com",
+    "password": "securepassword",
+    "userDeviceTimestamp": "2026-02-17T10:00:00.000Z",
+    "deviceName": "Jane iPhone",
+    "deviceType": "Phone",
+    "isTablet": false,
+    "manufacturer": "Apple",
+    "modelName": "iPhone 15",
+    "osName": "iOS",
+    "osVersion": "17.0"
+  }'
+```
+
 **Response:**
 
 ```json
@@ -102,6 +134,16 @@ Sends a password-reset email containing a short-lived JWT link.
 }
 ```
 
+**Example:**
+
+```bash
+curl -X POST http://localhost:3000/users/request-reset-password-email \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "jane.smith@example.com"
+  }'
+```
+
 **Response:**
 
 ```json
@@ -130,6 +172,17 @@ Resets the authenticated user's password. Requires a valid JWT (typically from t
 }
 ```
 
+**Example:**
+
+```bash
+curl -X POST http://localhost:3000/users/reset-password-with-new-password \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <reset-token>" \
+  -d '{
+    "password": "newSecurePassword"
+  }'
+```
+
 **Response:**
 
 ```json
@@ -154,6 +207,17 @@ Permanently deletes a user account after credential verification.
   "email": "string (required)",
   "password": "string (required)"
 }
+```
+
+**Example:**
+
+```bash
+curl -X DELETE http://localhost:3000/users/delete-account \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "jane.smith@example.com",
+    "password": "securepassword"
+  }'
 ```
 
 **Response:**
@@ -181,6 +245,17 @@ Registers a new user or logs in an existing user using a Google-provided identit
   "email": "string (required)",
   "name": "string (optional, full name from Google profile)"
 }
+```
+
+**Example:**
+
+```bash
+curl -X POST http://localhost:3000/users/register-or-login-via-google \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "jane.smith@gmail.com",
+    "name": "Jane Smith"
+  }'
 ```
 
 **Response:**
