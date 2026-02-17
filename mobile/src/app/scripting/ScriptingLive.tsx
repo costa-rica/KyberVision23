@@ -237,6 +237,10 @@ export default function ScriptingLive({ navigation }: ScriptingLiveProps) {
 
   const [padVisible, setPadVisible] = useState(false);
   const padVisibleRef = useRef(false);
+  // gatePassedRef: set true when tap passes the gate check, cleared only by
+  // handleSwipeOnEnd. Unlike padVisibleRef (which Tap.onEnd clears), this
+  // survives the iOS event ordering where Tap.onEnd fires before Pan.onEnd.
+  const gatePassedRef = useRef(false);
   const [tapIsActive, setTapIsActive] = useState(true);
   const [tapDetails, setTapDetails] = useState({
     timestamp: "no date",
@@ -320,6 +324,7 @@ export default function ScriptingLive({ navigation }: ScriptingLiveProps) {
         });
 
         if (gatePass) {
+          gatePassedRef.current = true;
           padVisibleRef.current = true;
           setPadVisible(true);
           setTapIsActive(false);
@@ -354,6 +359,7 @@ export default function ScriptingLive({ navigation }: ScriptingLiveProps) {
               scriptReducer.coordsScriptLiveLandscapeVwBelowSvgVolleyballCourt
                 .height!
         ) {
+          gatePassedRef.current = true;
           padVisibleRef.current = true;
           setPadVisible(true);
           setTapIsActive(false);
@@ -443,10 +449,11 @@ export default function ScriptingLive({ navigation }: ScriptingLiveProps) {
     event: GestureUpdateEvent<PanGestureHandlerEventPayload>
   ) => {
     if (serverStatusRequiredFlag) return;
-    if (!padVisibleRef.current) {
-      console.log("[DEBUG SWIPE_END] skipped - pad was not visible (gate-blocked tap)");
+    if (!gatePassedRef.current) {
+      console.log("[DEBUG SWIPE_END] skipped - gate was not passed");
       return;
     }
+    gatePassedRef.current = false;
     const { x, y, translationX, translationY, absoluteX, absoluteY } = event;
 
     const swipePosX = x - userReducer.circleRadiusOuter;
