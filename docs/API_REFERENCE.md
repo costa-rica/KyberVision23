@@ -16,6 +16,7 @@ Each resource has its own documentation under the [`/api`](./api) folder:
 - [scripts](./api/scripts.md)
 - [Sessions](./api/sessions.md)
 - [Teams](./api/teams.md)
+- [Users](./api/users.md)
 - [Videos](./api/videos.md)
 
 For database tables, see [DATABASE_OVERVIEW.md](./DATABASE_OVERVIEW.md).
@@ -44,88 +45,6 @@ All API responses follow a consistent format:
   "error": "Error message if applicable"
 }
 ```
-
----
-
-## users
-
-User authentication and registration endpoints.
-
-### POST /users/register
-
-Creates a new user account and handles invitation processing.
-
-**Request Body:**
-
-```json
-{
-  "firstName": "string",
-  "lastName": "string",
-  "password": "string (required)",
-  "email": "string (required, unique)"
-}
-```
-
-**Response:**
-
-```json
-{
-  "message": "Successfully created user",
-  "user": {
-    "id": "number",
-    "firstName": "string",
-    "lastName": "string",
-    "email": "string",
-    "username": "string"
-  },
-  "token": "string (JWT)"
-}
-```
-
-**Functionality:**
-
-- Generates username from email prefix
-- Hashes password with bcrypt
-- Sends registration email (environment dependent)
-- Processes pending team invitations if they exist
-- Auto-creates team user contracts for pending invitations
-
-### POST /users/login
-
-Authenticates a user and returns a JWT token.
-
-**Request Body:**
-
-```json
-{
-  "email": "string (required)",
-  "password": "string (required)"
-}
-```
-
-**Response:**
-
-```json
-{
-  "message": "Connexion r�ussie.",
-  "token": "string (JWT)",
-  "user": {
-    "id": "number",
-    "firstName": "string",
-    "lastName": "string",
-    "email": "string",
-    "username": "string",
-    "ContractTeamUsers": []
-  }
-}
-```
-
-**Functionality:**
-
-- Validates credentials against database
-- Updates user's `updatedAt` timestamp
-- Returns user data without password
-- Includes associated team contracts
 
 ---
 
