@@ -31,6 +31,7 @@ import {
   updateCoordsScriptLiveLandscapeContainerMiddleBottom,
   updateCoordsScriptLiveLandscapeVwPlayerSuper,
   updateCoordsScriptLiveLandscapeVwBelowSvgVolleyballCourt,
+  updateCoordsScriptLiveLandscapeSvgCourt,
   updatePlayersArray,
   setScriptingForPlayerObject,
   Player,
@@ -238,14 +239,14 @@ export default function ScriptingLiveLandscape(
 
   // ---- Court Lines Visibility ----
 
+  const svgCourtL = scriptReducer.coordsScriptLiveLandscapeSvgCourt;
   const stylesVwLineCourtLeft: ViewStyle = {
     position: "absolute",
     left:
       scriptReducer.coordsScriptLiveLandscapeContainerMiddleBottom.width! *
       0.33,
     width: 0,
-    height:
-      scriptReducer.coordsScriptLiveLandscapeContainerMiddleBottom.height!,
+    height: (svgCourtL.y ?? 0) + (svgCourtL.height ?? 0),
     zIndex: 1,
     borderWidth: 1,
     borderStyle: "dashed",
@@ -257,8 +258,7 @@ export default function ScriptingLiveLandscape(
       scriptReducer.coordsScriptLiveLandscapeContainerMiddleBottom.width! *
       0.33,
     width: 0,
-    height:
-      scriptReducer.coordsScriptLiveLandscapeContainerMiddleBottom.height!,
+    height: (svgCourtL.y ?? 0) + (svgCourtL.height ?? 0),
     zIndex: 1,
     borderWidth: 1,
     borderStyle: "dashed",
@@ -268,9 +268,7 @@ export default function ScriptingLiveLandscape(
     position: "absolute",
     left: 0,
     width: scriptReducer.coordsScriptLiveLandscapeContainerMiddleBottom.width!,
-    top:
-      scriptReducer.coordsScriptLiveLandscapeContainerMiddleBottom.height! *
-      0.5,
+    top: (svgCourtL.y ?? 0) + (svgCourtL.height ?? 0) * 0.5,
     zIndex: 1,
     borderWidth: 1,
     borderStyle: "dashed",
@@ -327,6 +325,11 @@ export default function ScriptingLiveLandscape(
         height,
       })
     );
+  };
+
+  const handleOnLayoutSvgCourt = (event: any) => {
+    const { width, height, x, y } = event.nativeEvent.layout;
+    dispatch(updateCoordsScriptLiveLandscapeSvgCourt({ x, y, width, height }));
   };
 
   return (
@@ -599,7 +602,9 @@ export default function ScriptingLiveLandscape(
                         : null,
                     ]}
                   >
-                    <SvgVolleyballCourt />
+                    <View onLayout={handleOnLayoutSvgCourt}>
+                      <SvgVolleyballCourt />
+                    </View>
                   </View>
                   <View
                     style={styles.vwBelowSvgVolleyballCourt}

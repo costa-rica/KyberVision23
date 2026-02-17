@@ -236,6 +236,7 @@ export default function ScriptingLive({ navigation }: ScriptingLiveProps) {
   };
 
   const [padVisible, setPadVisible] = useState(false);
+  const padVisibleRef = useRef(false);
   const [tapIsActive, setTapIsActive] = useState(true);
   const [tapDetails, setTapDetails] = useState({
     timestamp: "no date",
@@ -319,6 +320,7 @@ export default function ScriptingLive({ navigation }: ScriptingLiveProps) {
         });
 
         if (gatePass) {
+          padVisibleRef.current = true;
           setPadVisible(true);
           setTapIsActive(false);
         } else {
@@ -352,6 +354,7 @@ export default function ScriptingLive({ navigation }: ScriptingLiveProps) {
               scriptReducer.coordsScriptLiveLandscapeVwBelowSvgVolleyballCourt
                 .height!
         ) {
+          padVisibleRef.current = true;
           setPadVisible(true);
           setTapIsActive(false);
         }
@@ -367,6 +370,7 @@ export default function ScriptingLive({ navigation }: ScriptingLiveProps) {
   ) => {
     if (serverStatusRequiredFlag) return;
     console.log("gestureTapEnd");
+    padVisibleRef.current = false;
     setPadVisible(false);
     setTapIsActive(true);
   };
@@ -439,6 +443,10 @@ export default function ScriptingLive({ navigation }: ScriptingLiveProps) {
     event: GestureUpdateEvent<PanGestureHandlerEventPayload>
   ) => {
     if (serverStatusRequiredFlag) return;
+    if (!padVisibleRef.current) {
+      console.log("[DEBUG SWIPE_END] skipped - pad was not visible (gate-blocked tap)");
+      return;
+    }
     const { x, y, translationX, translationY, absoluteX, absoluteY } = event;
 
     const swipePosX = x - userReducer.circleRadiusOuter;
@@ -464,8 +472,10 @@ export default function ScriptingLive({ navigation }: ScriptingLiveProps) {
 
       // Determine position portrait
       if (orientation == "portrait") {
-        const yThreshold = scriptReducer.coordsScriptLivePortraitContainerMiddle.y! +
-          scriptReducer.coordsScriptLivePortraitContainerMiddle.height! * 0.5;
+        // Y threshold based on SVG court's measured center position
+        const svgCourt = scriptReducer.coordsScriptLivePortraitSvgCourt;
+        const svgMidY = (svgCourt.y ?? 0) + (svgCourt.height ?? 0) * 0.5;
+        const yThreshold = scriptReducer.coordsScriptLivePortraitContainerMiddle.y! + svgMidY;
         const xThreshold33 = scriptReducer.coordsScriptLivePortraitContainerMiddle.width! * 0.33;
         const xThreshold66 = scriptReducer.coordsScriptLivePortraitContainerMiddle.width! * 0.66;
         console.log(`[DEBUG SWIPE_END] tapXAdjusted=${tapXAdjusted}, tapYAdjusted=${tapYAdjusted}`);
@@ -512,12 +522,11 @@ export default function ScriptingLive({ navigation }: ScriptingLiveProps) {
               .width! * 0.33
           }`
         );
+        const svgCourtL = scriptReducer.coordsScriptLiveLandscapeSvgCourt;
+        const svgMidYL = (svgCourtL.y ?? 0) + (svgCourtL.height ?? 0) * 0.5;
+        const yThresholdLandscape = scriptReducer.coordsScriptLiveLandscapeContainerMiddleTop.height! + svgMidYL;
         if (
-          tapYAdjusted >
-          scriptReducer.coordsScriptLiveLandscapeContainerMiddleTop.height! +
-            scriptReducer.coordsScriptLiveLandscapeContainerMiddleBottom
-              .height! /
-              2
+          tapYAdjusted > yThresholdLandscape
         ) {
           // Landscape Back Row
           if (

@@ -31,6 +31,7 @@ import {
   updateCoordsScriptLivePortraitContainerMiddle,
   updateScriptSessionActionsArray,
   updateCoordsScriptLivePortraitVwPlayerSuperSpacer,
+  updateCoordsScriptLivePortraitSvgCourt,
   setScriptingForPlayerObject,
   updatePlayersArray,
   Player,
@@ -109,6 +110,11 @@ export default function ScriptingLivePortrait(
     );
   };
 
+  const handleOnLayoutSvgCourt = (event: any) => {
+    const { width, height, x, y } = event.nativeEvent.layout;
+    dispatch(updateCoordsScriptLivePortraitSvgCourt({ x, y, width, height }));
+  };
+
   const handleLastActionPlayerName = () => {
     const lastActionPlayerId =
       scriptReducer.sessionActionsArray[
@@ -125,6 +131,11 @@ export default function ScriptingLivePortrait(
   };
 
   const btnDiameter = Dimensions.get("window").width * 0.15;
+  // Cap the spacer height so it doesn't consume too much of the front-row
+  // gesture zone on tablets (e.g. 601px width → btnDiameter=90 → spacer=90).
+  // On phones (~390px width) btnDiameter ≈ 58 which is already fine.
+  const maxSpacerHeight = 65;
+  const spacerHeight = Math.min(btnDiameter, maxSpacerHeight);
 
   const stylesBtnTop: ViewStyle = {
     width: btnDiameter,
@@ -227,12 +238,12 @@ export default function ScriptingLivePortrait(
 
   const stylesVwPlayerSuperSpacer: ViewStyle = {
     width: "100%",
-    height: btnDiameter,
+    height: spacerHeight,
   };
 
   const stylesVwPlayerAbsolutePosition: ViewStyle = {
     position: "absolute",
-    top: btnDiameter / 4,
+    top: spacerHeight / 4,
     zIndex: 1,
   };
 
@@ -250,7 +261,7 @@ export default function ScriptingLivePortrait(
 
   const stylesDropDownScriptingPlayer: ViewStyle = {
     position: "absolute",
-    top: btnDiameter * 0.85,
+    top: spacerHeight * 0.85,
     zIndex: 1,
   };
 
@@ -274,11 +285,13 @@ export default function ScriptingLivePortrait(
 
   // ---- Court Lines Visibility ----
 
+  const svgCourt = scriptReducer.coordsScriptLivePortraitSvgCourt;
   const stylesVwLinePortaitCourtLeft: ViewStyle = {
     position: "absolute",
     left: scriptReducer.coordsScriptLivePortraitContainerMiddle.width! * 0.33,
+    top: svgCourt.y ?? 0,
     width: 0,
-    height: scriptReducer.coordsScriptLivePortraitContainerMiddle.height!,
+    height: svgCourt.height ?? 0,
     zIndex: 1,
     borderWidth: 1,
     borderStyle: "dashed",
@@ -287,8 +300,9 @@ export default function ScriptingLivePortrait(
   const stylesVwLinePortaitCourtRight: ViewStyle = {
     position: "absolute",
     right: scriptReducer.coordsScriptLivePortraitContainerMiddle.width! * 0.33,
+    top: svgCourt.y ?? 0,
     width: 0,
-    height: scriptReducer.coordsScriptLivePortraitContainerMiddle.height!,
+    height: svgCourt.height ?? 0,
     zIndex: 1,
     borderWidth: 1,
     borderStyle: "dashed",
@@ -298,7 +312,7 @@ export default function ScriptingLivePortrait(
     position: "absolute",
     left: 0,
     width: scriptReducer.coordsScriptLivePortraitContainerMiddle.width!,
-    top: scriptReducer.coordsScriptLivePortraitContainerMiddle.height! * 0.5,
+    top: (svgCourt.y ?? 0) + (svgCourt.height ?? 0) * 0.5,
     zIndex: 1,
     borderWidth: 1,
     borderStyle: "dashed",
@@ -757,7 +771,9 @@ export default function ScriptingLivePortrait(
 									}
 								</Text>
 							</View> */}
-              <SvgVolleyballCourt />
+              <View onLayout={handleOnLayoutSvgCourt}>
+                <SvgVolleyballCourt />
+              </View>
             </View>
           </GestureDetector>
         </View>

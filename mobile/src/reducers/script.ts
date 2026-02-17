@@ -93,6 +93,8 @@ export interface ScriptState {
 	coordsScriptLiveLandscapeContainerMiddleBottom: Coordinates;
 	coordsScriptLiveLandscapeVwPlayerSuper: Coordinates;
 	coordsScriptLiveLandscapeVwBelowSvgVolleyballCourt: Coordinates;
+	coordsScriptLivePortraitSvgCourt: Coordinates;
+	coordsScriptLiveLandscapeSvgCourt: Coordinates;
 }
 
 const initialState: ScriptState = {
@@ -195,6 +197,18 @@ const initialState: ScriptState = {
 		height: null,
 	},
 	coordsScriptLiveLandscapeVwBelowSvgVolleyballCourt: {
+		x: null,
+		y: null,
+		width: null,
+		height: null,
+	},
+	coordsScriptLivePortraitSvgCourt: {
+		x: null,
+		y: null,
+		width: null,
+		height: null,
+	},
+	coordsScriptLiveLandscapeSvgCourt: {
 		x: null,
 		y: null,
 		width: null,
@@ -342,6 +356,18 @@ export const scriptSlice = createSlice({
 		) => {
 			state.coordsScriptLiveLandscapeVwBelowSvgVolleyballCourt = action.payload;
 		},
+		updateCoordsScriptLivePortraitSvgCourt: (
+			state,
+			action: PayloadAction<Coordinates>
+		) => {
+			state.coordsScriptLivePortraitSvgCourt = action.payload;
+		},
+		updateCoordsScriptLiveLandscapeSvgCourt: (
+			state,
+			action: PayloadAction<Coordinates>
+		) => {
+			state.coordsScriptLiveLandscapeSvgCourt = action.payload;
+		},
 		createPlayerArrayPositionProperties: (
 			state,
 			action: PayloadAction<Player[]>
@@ -411,6 +437,8 @@ export const {
 	updateCoordsScriptLivePortraitVwPlayerSuperSpacer,
 	updateCoordsScriptLiveLandscapeVwPlayerSuper,
 	updateCoordsScriptLiveLandscapeVwBelowSvgVolleyballCourt,
+	updateCoordsScriptLivePortraitSvgCourt,
+	updateCoordsScriptLiveLandscapeSvgCourt,
 	createPlayerArrayPositionProperties,
 } = scriptSlice.actions;
 
