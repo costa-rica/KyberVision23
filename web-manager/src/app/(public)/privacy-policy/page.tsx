@@ -11,18 +11,23 @@ export default function PrivacyPolicyPage() {
       {/* Header */}
       <header className="sticky top-0 z-10 border-b border-border bg-card/80 px-6 py-4 backdrop-blur-sm md:px-10">
         <div className="mx-auto flex max-w-3xl items-center justify-between">
-          <Link href="/">
-            <img
-              src="/images/KyberVisionLogo.png"
-              alt="Kyber Vision"
-              className="h-7"
-            />
-          </Link>
           <Link
             href="/"
             className="text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
             &larr; Back
+          </Link>
+          <Link href="/">
+            <img
+              src="/images/KyberVisionLogo.png"
+              alt="Kyber Vision"
+              className="h-7 hidden dark:block"
+            />
+        <img
+              src="/images/KyberVisionLogoBlack.png"
+              alt="Kyber Vision"
+              className="h-7 block dark:hidden"
+            />
           </Link>
         </div>
       </header>

@@ -43,15 +43,9 @@ export function DashboardHeader() {
 
   return (
     <header className="relative z-10 flex items-center justify-between border-b border-border bg-card/80 px-4 py-3 backdrop-blur-sm md:px-6 lg:px-8">
-      <div className="flex items-center gap-3">
-        <img
-          src="/images/KyberVisionLogo.png"
-          alt="Kyber Vision"
-          className="h-7"
-        />
-        <span className="hidden text-sm font-medium text-muted-foreground sm:inline">
-          Database Manager
-        </span>
+      <div className="flex items-center">
+        <img src="/images/KyberVisionLogo.png" alt="Kyber Vision" className="h-7 hidden dark:block" />
+        <img src="/images/KyberVisionLogoBlack.png" alt="Kyber Vision" className="h-7 block dark:hidden" />
       </div>
 
       <div className="flex items-center gap-1">

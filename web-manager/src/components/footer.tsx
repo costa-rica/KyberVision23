@@ -12,6 +12,13 @@ export function Footer() {
         >
           Privacy Policy
         </Link>
+        <span className="hidden sm:inline text-border">|</span>
+        <Link
+          href="/delete-account"
+          className="transition-colors hover:text-foreground"
+        >
+          Delete Account
+        </Link>
       </div>
     </footer>
   )

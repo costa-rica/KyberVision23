@@ -71,7 +71,12 @@ export function ForgotPasswordModal({
           <img
             src="/images/KyberVisionLogo.png"
             alt="Kyber Vision"
-            className="h-10"
+            className="h-10 hidden dark:block"
+          />
+        <img
+            src="/images/KyberVisionLogoBlack.png"
+            alt="Kyber Vision"
+            className="h-10 block dark:hidden"
           />
         </div>
 
