@@ -73,6 +73,10 @@ router.get(
         tableData = [dummyRow];
       }
 
+      if (tableName === "User") {
+        tableData = tableData.map(({ password, ...rest }: any) => rest);
+      }
+
       res.json({ result: true, data: tableData });
     } catch (error: any) {
       logger.error("Error fetching table data:", error);
