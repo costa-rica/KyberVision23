@@ -8,15 +8,15 @@ The Scripting Live screen allows a user to record volleyball game actions in rea
 
 ## Key Files
 
-| File | Role |
-|---|---|
-| `src/app/scripting/ScriptingLive.tsx` | Main logic: gesture definitions, action recording, score tracking |
-| `src/components/scripting/ScriptingLivePortrait.tsx` | Portrait layout: court, score UI, last-action dropdowns |
-| `src/components/scripting/ScriptingLiveLandscape.tsx` | Landscape layout variant |
-| `src/components/swipe-pads/SwipePad.tsx` | The radial wheel rendered at the tap point |
-| `src/app/scripting/ScriptingLiveSelectPlayers.tsx` | Pre-screen that sets SwipePad radii and player lineup |
-| `src/reducers/script.ts` | Redux state: actions array, coordinate measurements, player positions |
-| `src/reducers/user.ts` | Redux state: SwipePad radii (`circleRadiusOuter/Middle/Inner`), wheel colors |
+| File                                                  | Role                                                                         |
+| ----------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `src/app/scripting/ScriptingLive.tsx`                 | Main logic: gesture definitions, action recording, score tracking            |
+| `src/components/scripting/ScriptingLivePortrait.tsx`  | Portrait layout: court, score UI, last-action dropdowns                      |
+| `src/components/scripting/ScriptingLiveLandscape.tsx` | Landscape layout variant                                                     |
+| `src/components/swipe-pads/SwipePad.tsx`              | The radial wheel rendered at the tap point                                   |
+| `src/app/scripting/ScriptingLiveSelectPlayers.tsx`    | Pre-screen that sets SwipePad radii and player lineup                        |
+| `src/reducers/script.ts`                              | Redux state: actions array, coordinate measurements, player positions        |
+| `src/reducers/user.ts`                                | Redux state: SwipePad radii (`circleRadiusOuter/Middle/Inner`), wheel colors |
 
 ## Orientation Handling
 
@@ -37,9 +37,11 @@ When the user taps inside the `GestureDetector` area:
    - The `event.x` / `event.y` are relative to the GestureDetector's child view (`containerMiddleSub`), not the screen.
    - `containerMiddle.y` is an offset measured via `onLayout` to translate into the parent coordinate system.
 3. **Gate condition** (portrait): The SwipePad only appears if:
+
    ```
    event.y > coordsScriptLivePortraitVwPlayerSuperSpacer.height
    ```
+
    This prevents taps in the player name spacer area (at the top of the gesture view) from triggering an action. The spacer height equals `btnDiameter = Dimensions.get("window").width * 0.15`.
 
 4. If the gate passes, `padVisible` is set to `true` and `tapIsActive` is set to `false` (preventing double-taps).
@@ -86,17 +88,17 @@ When the tap gesture ends (up to 10 second `maxDuration`):
 
 Each recorded action (`SessionAction` in `src/reducers/script.ts`) contains:
 
-| Field | Source |
-|---|---|
-| `type` | Middle ring quadrant (Bl, Def, Set, Att, Serve, Reception) |
-| `quality` | Outer ring sector (=, -, 0, +, #) |
-| `area` | Court zone 1-6 from tap position |
-| `playerId` | Either `scriptingForPlayerObject.id` (single-player mode) or from `playerObjectPositionalArray[area - 1]` (positional mode) |
-| `setNumber` | Derived from `matchSetsWon.teamAnalyzed + matchSetsWon.teamOpponent + 1` |
-| `scoreTeamAnalyzed` / `scoreTeamOther` | Current set scores at time of action |
-| `currentRallyServer` | "analyzed" or "opponent" |
-| `timestamp` | `Date.now()` |
-| `subtype` | `null` initially; can be modified after recording via the last-action dropdown |
+| Field                                  | Source                                                                                                                      |
+| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `type`                                 | Middle ring quadrant (Bl, Def, Set, Att, Serve, Reception)                                                                  |
+| `quality`                              | Outer ring sector (=, -, 0, +, #)                                                                                           |
+| `area`                                 | Court zone 1-6 from tap position                                                                                            |
+| `playerId`                             | Either `scriptingForPlayerObject.id` (single-player mode) or from `playerObjectPositionalArray[area - 1]` (positional mode) |
+| `setNumber`                            | Derived from `matchSetsWon.teamAnalyzed + matchSetsWon.teamOpponent + 1`                                                    |
+| `scoreTeamAnalyzed` / `scoreTeamOther` | Current set scores at time of action                                                                                        |
+| `currentRallyServer`                   | "analyzed" or "opponent"                                                                                                    |
+| `timestamp`                            | `Date.now()`                                                                                                                |
+| `subtype`                              | `null` initially; can be modified after recording via the last-action dropdown                                              |
 
 ## SwipePad Radii
 
@@ -184,12 +186,13 @@ On Android tablets (not yet tested on iPad), there is an area in the upper porti
 The Y-split that divides front row from back row uses:
 
 ```js
-tapYAdjusted > containerMiddle.y + containerMiddle.height * 0.5
+tapYAdjusted > containerMiddle.y + containerMiddle.height * 0.5;
 ```
 
 Which simplifies to `event.y > containerMiddle.height * 0.5`.
 
 But `containerMiddle.height` includes:
+
 - `vwPlayerSuperSpacer` (height = `Dimensions.get("window").width * 0.15`)
 - `SvgVolleyballCourt` intrinsic height
 - 20px padding + 4px border
