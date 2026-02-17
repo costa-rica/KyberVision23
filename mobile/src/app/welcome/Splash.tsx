@@ -53,14 +53,14 @@ export default function Splash({ navigation }: SplashScreenProps) {
         email: userReducerOffline.user.email,
         token: userReducerOffline.token,
         username: userReducerOffline.user.username,
-      })
+      }),
     );
     navigation.navigate("SelectTeam");
   };
 
   useEffect(() => {
     console.log(
-      `EXPO_PUBLIC_API_BASE_URL: ${process.env.EXPO_PUBLIC_API_BASE_URL}`
+      `EXPO_PUBLIC_API_BASE_URL: ${process.env.EXPO_PUBLIC_API_BASE_URL}`,
     );
 
     if (userReducer.token) {
@@ -162,12 +162,12 @@ export default function Splash({ navigation }: SplashScreenProps) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, username: name }),
-      }
+      },
     );
 
     console.log(
       "Received response [requestRegisterOrLoginGoogle]:",
-      response.status
+      response.status,
     );
 
     let resJson: any = null;
@@ -183,13 +183,13 @@ export default function Splash({ navigation }: SplashScreenProps) {
           email: resJson.user.email,
           token: resJson.token,
           username: resJson.user.email.split("@")[0],
-        })
+        }),
       );
       navigation.navigate("Home");
     } else if (resJson?.error) {
       console.log(
         "Received response [requestRegisterOrLoginGoogle]:",
-        resJson.error
+        resJson.error,
       );
       setInfoModalContent({
         title: "There was a KV server error while signing in with Google",
@@ -331,7 +331,7 @@ export default function Splash({ navigation }: SplashScreenProps) {
             continue without login
           </ButtonKvStd>
           <Text style={{ position: "absolute", bottom: 20, right: 30 }}>
-            Version 0.22.0
+            Version 0.23.3
           </Text>
         </View>
       </View>
