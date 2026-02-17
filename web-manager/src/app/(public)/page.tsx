@@ -1,18 +1,26 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTheme } from 'next-themes'
 import { Button } from '@/components/ui/button'
 import { LoginModal } from '@/components/modals/login-modal'
 import { RegisterModal } from '@/components/modals/register-modal'
 import { ForgotPasswordModal } from '@/components/modals/forgot-password-modal'
-import { Database } from 'lucide-react'
+import { Database, Sun, Moon } from 'lucide-react'
+import { Footer } from '@/components/footer'
 
 type ModalView = 'none' | 'login' | 'register' | 'forgot-password'
 
 export default function LandingPage() {
   const [activeModal, setActiveModal] = useState<ModalView>('none')
   const router = useRouter()
+  const { resolvedTheme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => setMounted(true), [])
+
+  const isDark = resolvedTheme === 'dark'
 
   const handleAuthSuccess = () => {
     setActiveModal('none')
@@ -37,13 +45,26 @@ export default function LandingPage() {
           alt="Kyber Vision"
           className="h-8 md:h-10"
         />
-        <Button
-          onClick={() => setActiveModal('login')}
-          variant="outline"
-          className="rounded-full border-kyber-purple text-kyber-purple-light hover:bg-kyber-purple hover:text-primary-foreground"
-        >
-          Sign In
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={() => setActiveModal('login')}
+            variant="outline"
+            className="rounded-full border-kyber-purple text-kyber-purple-light hover:bg-kyber-purple hover:text-primary-foreground"
+          >
+            Sign In
+          </Button>
+          {mounted && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full text-muted-foreground hover:text-foreground"
+              onClick={() => setTheme(isDark ? 'light' : 'dark')}
+              aria-label="Toggle theme"
+            >
+              {isDark ? <Sun className="size-5" /> : <Moon className="size-5" />}
+            </Button>
+          )}
+        </div>
       </header>
 
       {/* Hero Section */}
@@ -75,10 +96,7 @@ export default function LandingPage() {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="relative z-10 py-6 text-center text-sm text-muted-foreground">
-        <p>Kyber Vision &mdash; Volleyball Analytics Platform</p>
-      </footer>
+      <Footer />
 
       {/* Modals */}
       <LoginModal

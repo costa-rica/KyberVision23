@@ -1,5 +1,6 @@
 import { DashboardHeader } from '@/components/dashboard/dashboard-header'
 import { AuthGuard } from '@/components/dashboard/auth-guard'
+import { Footer } from '@/components/footer'
 
 export default function DashboardLayout({
   children,
@@ -21,6 +22,7 @@ export default function DashboardLayout({
         <main className="relative z-10 flex-1 px-4 pb-8 pt-4 md:px-6 lg:px-8">
           {children}
         </main>
+        <Footer />
       </div>
     </AuthGuard>
   )

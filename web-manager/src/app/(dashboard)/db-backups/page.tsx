@@ -23,6 +23,7 @@ import {
   Upload,
   Plus,
   FileArchive,
+  Trash2,
 } from 'lucide-react'
 import apiClient from '@/lib/api/client'
 
@@ -44,6 +45,7 @@ export default function DbBackupsPage() {
   const [error, setError] = useState<string | null>(null)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
 
   // Fetch backups and table counts on mount
   useEffect(() => {
@@ -92,6 +94,21 @@ export default function DbBackupsPage() {
     } finally {
       setLoading(false)
       setLoadingDetail(undefined)
+    }
+  }
+
+  async function handleDeleteBackup(filename: string) {
+    if (!window.confirm(`Delete backup "${filename}"?`)) return
+    setLoading(true)
+    setLoadingMessage('Deleting backup...')
+    setError(null)
+    try {
+      await apiClient.delete(`/admin-db/delete-db-backup/${encodeURIComponent(filename)}`)
+      await refreshBackups()
+    } catch {
+      setError(`Failed to delete ${filename}.`)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -144,15 +161,14 @@ export default function DbBackupsPage() {
     } finally {
       setLoading(false)
       setLoadingDetail(undefined)
+      setSelectedFile(null)
     }
   }
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
-    if (file) {
-      handleUpload(file)
-      e.target.value = ''
-    }
+    if (file) setSelectedFile(file)
+    e.target.value = ''
   }
 
   return (
@@ -226,6 +242,13 @@ export default function DbBackupsPage() {
                         {filename}
                       </button>
                       <Download className="size-3 shrink-0 text-muted-foreground" />
+                      <button
+                        onClick={() => handleDeleteBackup(filename)}
+                        className="group ml-1 shrink-0"
+                        title={`Delete ${filename}`}
+                      >
+                        <Trash2 className="size-3.5 text-muted-foreground transition-colors group-hover:text-destructive" />
+                      </button>
                     </li>
                   ))}
                 </ul>
@@ -255,9 +278,25 @@ export default function DbBackupsPage() {
                   onChange={handleFileChange}
                   aria-label="Upload backup zip file"
                 />
-                <span className="text-xs text-muted-foreground">
-                  .zip files only
-                </span>
+                {selectedFile ? (
+                  <>
+                    <span className="max-w-48 truncate text-xs text-foreground">
+                      {selectedFile.name}
+                    </span>
+                    <Button
+                      size="sm"
+                      className="bg-kyber-purple text-primary-foreground hover:bg-kyber-purple-hover"
+                      onClick={() => handleUpload(selectedFile)}
+                    >
+                      <Upload className="size-4" />
+                      Restore
+                    </Button>
+                  </>
+                ) : (
+                  <span className="text-xs text-muted-foreground">
+                    .zip files only
+                  </span>
+                )}
               </div>
             </div>
           </CollapsibleContent>

@@ -11,6 +11,7 @@ import {
 import { DataTable } from "@/components/data-table/data-table";
 import { RecordForm } from "@/components/data-table/record-form";
 import { LoadingOverlay } from "@/components/loading-overlay";
+import { ConfirmModal } from "@/components/modals/confirm-modal";
 import { Database } from "lucide-react";
 import apiClient from "@/lib/api/client";
 import type { ColumnConfig } from "@/lib/types";
@@ -62,6 +63,7 @@ export default function DashboardPage() {
   const [rows, setRows] = useState<RowData[]>([]);
   const [columns, setColumns] = useState<ColumnConfig[]>([]);
   const [selectedRow, setSelectedRow] = useState<RowData | null>(null);
+  const [confirmRow, setConfirmRow] = useState<RowData | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadingMessage, setLoadingMessage] = useState("Loading tables...");
   const [error, setError] = useState<string | null>(null);
@@ -184,27 +186,26 @@ export default function DashboardPage() {
     [activeTable, refreshTable]
   );
 
-  const handleDelete = useCallback(
-    async (row: RowData) => {
-      const confirmed = window.confirm(
-        `Delete row with id ${row.id} from ${activeTable}?`
+  const handleDelete = useCallback((row: RowData) => {
+    setConfirmRow(row);
+  }, []);
+
+  const handleConfirmDelete = useCallback(async () => {
+    if (!confirmRow) return;
+    setConfirmRow(null);
+    setLoading(true);
+    setLoadingMessage("Deleting row...");
+    try {
+      await apiClient.delete(
+        `/admin-db/table-row/${activeTable}/${confirmRow.id}`
       );
-      if (!confirmed) return;
-      setLoading(true);
-      setLoadingMessage("Deleting row...");
-      try {
-        await apiClient.delete(
-          `/admin-db/table-row/${activeTable}/${row.id}`
-        );
-        if (selectedRow?.id === row.id) setSelectedRow(null);
-        await refreshTable();
-      } catch {
-        setError("Failed to delete row.");
-        setLoading(false);
-      }
-    },
-    [activeTable, selectedRow, refreshTable]
-  );
+      if (selectedRow?.id === confirmRow.id) setSelectedRow(null);
+      await refreshTable();
+    } catch {
+      setError("Failed to delete row.");
+      setLoading(false);
+    }
+  }, [confirmRow, activeTable, selectedRow, refreshTable]);
 
   const handleClear = useCallback(() => {
     setSelectedRow(null);
@@ -213,6 +214,15 @@ export default function DashboardPage() {
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-6">
       <LoadingOverlay visible={loading} message={loadingMessage} />
+      <ConfirmModal
+        isOpen={confirmRow !== null}
+        title="Delete Row"
+        message={`Delete row with id ${confirmRow?.id} from ${activeTable}?`}
+        confirmLabel="Delete"
+        variant="danger"
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setConfirmRow(null)}
+      />
 
       {/* Page header and table selector */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

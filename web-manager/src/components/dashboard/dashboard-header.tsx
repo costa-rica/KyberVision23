@@ -2,8 +2,9 @@
 
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useDispatch } from 'react-redux'
+import { useTheme } from 'next-themes'
 import { logout } from '@/store/slices/authSlice'
 import { Button } from '@/components/ui/button'
 import {
@@ -15,18 +16,30 @@ import {
   SheetDescription,
   SheetClose,
 } from '@/components/ui/sheet'
-import { LogOut, Menu, Database, HardDrive } from 'lucide-react'
+import { LogOut, Menu, Database, HardDrive, Video, Sun, Moon } from 'lucide-react'
 
 const NAV_ITEMS = [
   { href: '/dashboard', label: 'Home', icon: Database },
   { href: '/db-backups', label: 'Db Backups', icon: HardDrive },
+  { href: '/manage-videos', label: 'Manage Videos', icon: Video },
 ]
 
 export function DashboardHeader() {
   const router = useRouter()
   const pathname = usePathname()
   const dispatch = useDispatch()
+  const { resolvedTheme, setTheme } = useTheme()
   const [open, setOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => setMounted(true), [])
+
+  const isDark = resolvedTheme === 'dark'
+
+  function handleSignOut() {
+    dispatch(logout())
+    router.push('/')
+  }
 
   return (
     <header className="relative z-10 flex items-center justify-between border-b border-border bg-card/80 px-4 py-3 backdrop-blur-sm md:px-6 lg:px-8">
@@ -42,18 +55,18 @@ export function DashboardHeader() {
       </div>
 
       <div className="flex items-center gap-1">
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-muted-foreground hover:text-foreground"
-          onClick={() => {
-            dispatch(logout())
-            router.push('/')
-          }}
-        >
-          <LogOut className="size-4" />
-          <span className="hidden sm:inline">Sign Out</span>
-        </Button>
+        {/* Theme toggle */}
+        {mounted && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-muted-foreground hover:text-foreground"
+            onClick={() => setTheme(isDark ? 'light' : 'dark')}
+            aria-label="Toggle theme"
+          >
+            {isDark ? <Sun className="size-5" /> : <Moon className="size-5" />}
+          </Button>
+        )}
 
         {/* Navigation menu trigger */}
         <Sheet open={open} onOpenChange={setOpen}>
@@ -70,7 +83,7 @@ export function DashboardHeader() {
 
           <SheetContent
             side="right"
-            className="border-border bg-kyber-charcoal-dark"
+            className="border-border bg-kyber-charcoal-dark flex flex-col"
           >
             <SheetHeader>
               <SheetTitle className="text-foreground">Navigation</SheetTitle>
@@ -100,6 +113,20 @@ export function DashboardHeader() {
                 )
               })}
             </nav>
+
+            <div className="mt-auto px-4 pb-2">
+              <div className="border-t border-border pt-4">
+                <SheetClose asChild>
+                  <button
+                    onClick={handleSignOut}
+                    className="flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary/50 hover:text-foreground"
+                  >
+                    <LogOut className="size-4" />
+                    Sign Out
+                  </button>
+                </SheetClose>
+              </div>
+            </div>
           </SheetContent>
         </Sheet>
       </div>
