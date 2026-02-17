@@ -19,9 +19,31 @@ type RowData = Record<string, string | number | null>;
 
 const HIDDEN_COLUMNS = new Set(["createdAt", "updatedAt", "deletedAt", "password"]);
 
-function deriveColumns(rows: RowData[]): ColumnConfig[] {
+type ColumnMeta = { key: string; sequelizeType: string };
+
+function sequelizeTypeToColumnType(seqType: string): ColumnConfig["type"] {
+  switch (seqType) {
+    case "boolean": return "boolean";
+    case "integer":
+    case "float":
+    case "double":
+    case "decimal":
+    case "bigint":
+      return "number";
+    case "date":
+    case "dateonly":
+      return "date";
+    default:
+      return "text";
+  }
+}
+
+function deriveColumns(rows: RowData[], columnMeta?: ColumnMeta[]): ColumnConfig[] {
   if (rows.length === 0) return [];
   const keys = Object.keys(rows[0]);
+  const typeMap = columnMeta
+    ? Object.fromEntries(columnMeta.map((m) => [m.key, sequelizeTypeToColumnType(m.sequelizeType)]))
+    : {};
   return keys.map((key) => ({
     key,
     label: key
@@ -29,7 +51,7 @@ function deriveColumns(rows: RowData[]): ColumnConfig[] {
       .replace(/_/g, " ")
       .replace(/^\w/, (c) => c.toUpperCase())
       .trim(),
-    type: "text" as const,
+    type: typeMap[key] ?? "text",
     visibleByDefault: !HIDDEN_COLUMNS.has(key),
   }));
 }
@@ -84,7 +106,7 @@ export default function DashboardPage() {
         if (cancelled) return;
         const tableData = data.data as RowData[];
         setRows(tableData);
-        setColumns(deriveColumns(tableData));
+        setColumns(deriveColumns(tableData, data.columnMeta));
         setSelectedRow(null);
       } catch {
         if (!cancelled) setError(`Failed to load ${activeTable}.`);
@@ -104,7 +126,7 @@ export default function DashboardPage() {
       const { data } = await apiClient.get(`/admin-db/table/${activeTable}`);
       const tableData = data.data as RowData[];
       setRows(tableData);
-      setColumns(deriveColumns(tableData));
+      setColumns(deriveColumns(tableData, data.columnMeta));
     } catch {
       setError(`Failed to refresh ${activeTable}.`);
     } finally {

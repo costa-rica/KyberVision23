@@ -16,6 +16,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { ChevronDown, Plus, Save, Eraser } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { ColumnConfig } from "@/lib/types";
@@ -104,11 +105,26 @@ export function RecordForm({
                   <div key={col.key} className="flex flex-col gap-1.5">
                     <Label
                       htmlFor={`form-${col.key}`}
-                      className="text-xs font-medium text-muted-foreground"
+                      className="select-text text-xs font-medium text-muted-foreground"
                     >
                       {col.label}
                     </Label>
-                    {col.type === "select" && col.selectOptions ? (
+                    {col.type === "boolean" ? (
+                      <RadioGroup
+                        value={value != null ? String(value) : ""}
+                        onValueChange={(v) => handleFieldChange(col.key, v)}
+                        className="flex gap-4 pt-1"
+                      >
+                        <label className="flex cursor-pointer items-center gap-1.5 text-sm text-foreground">
+                          <RadioGroupItem value="1" id={`form-${col.key}-true`} />
+                          True
+                        </label>
+                        <label className="flex cursor-pointer items-center gap-1.5 text-sm text-foreground">
+                          <RadioGroupItem value="0" id={`form-${col.key}-false`} />
+                          False
+                        </label>
+                      </RadioGroup>
+                    ) : col.type === "select" && col.selectOptions ? (
                       <Select
                         value={value != null ? String(value) : ""}
                         onValueChange={(v) => handleFieldChange(col.key, v)}

@@ -77,7 +77,14 @@ router.get(
         tableData = tableData.map(({ password, ...rest }: any) => rest);
       }
 
-      res.json({ result: true, data: tableData });
+      const columnMeta = Object.entries(models[tableName].rawAttributes).map(
+        ([key, attr]: [string, any]) => ({
+          key,
+          sequelizeType: (attr.type?.key ?? "STRING").toLowerCase(),
+        })
+      );
+
+      res.json({ result: true, data: tableData, columnMeta });
     } catch (error: any) {
       logger.error("Error fetching table data:", error);
       res.status(500).json({
