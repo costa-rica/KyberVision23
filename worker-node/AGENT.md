@@ -1,4 +1,4 @@
-# CLAUDE.md
+# AGENT.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -77,9 +77,9 @@ src/
 
 Two queues are defined. Their names are driven entirely by environment variables.
 
-| Queue env var | Default name | Worker location | Processing method |
-|---|---|---|---|
-| `YOUTUBE_UPLOADER_QUEUE_NAME` | `YouTubeUploadProcess` | `routes/youtubeUploader.ts` | Direct function call |
+| Queue env var                       | Default name                     | Worker location               | Processing method    |
+| ----------------------------------- | -------------------------------- | ----------------------------- | -------------------- |
+| `YOUTUBE_UPLOADER_QUEUE_NAME`       | `YouTubeUploadProcess`           | `routes/youtubeUploader.ts`   | Direct function call |
 | `NAME_KV_VIDEO_MONTAGE_MAKER_QUEUE` | `KyberVision23VideoMontageMaker` | `routes/montageVideoMaker.ts` | Direct function call |
 
 **Both queues:** `concurrency: 2`, `removeOnComplete: false`, `removeOnFail: false`.
@@ -89,6 +89,7 @@ Two queues are defined. Their names are driven entirely by environment variables
 Calls `uploadVideo(filename, videoId)` from `src/modules/youtubeUploadService.ts` directly inside the BullMQ worker processor. No child process is involved.
 
 Progress checkpoints:
+
 - `10%` — job started
 - `25%` — OAuth2 client configured, upload beginning
 - `100%` — upload complete, DB updated
@@ -110,6 +111,7 @@ On error: sets `Video.processingFailed = true` via `@kybervision/db` and re-thro
 Calls `createVideoMontage(...)` from `src/modules/videoMontageService.ts` directly inside the BullMQ worker processor.
 
 Progress checkpoints:
+
 - `10%` — starting clip extraction
 - `45%` — clip extraction complete
 - `70%` — montage merge complete
@@ -134,22 +136,22 @@ Morgan HTTP logging is disabled for `/dashboard` routes.
 
 See `.env.example` for the full list. Key variables:
 
-| Variable | Purpose |
-|---|---|
-| `PORT` | HTTP listen port (default: 8003) |
-| `REDIS_HOST` / `REDIS_PORT` | Redis connection |
-| `PATH_DATABASE` / `NAME_DB` | SQLite database location |
-| `YOUTUBE_UPLOADER_QUEUE_NAME` | YouTube upload queue name (`YouTubeUploadProcess`) |
-| `NAME_KV_VIDEO_MONTAGE_MAKER_QUEUE` | Montage queue name |
-| `YOUTUBE_CLIENT_ID` | Google OAuth2 client ID |
-| `YOUTUBE_CLIENT_SECRET` | Google OAuth2 client secret |
-| `YOUTUBE_REDIRECT_URI` | Google OAuth2 redirect URI |
-| `YOUTUBE_REFRESH_TOKEN` | Long-lived refresh token for YouTube API |
-| `PATH_VIDEOS_UPLOADED` | Directory where uploaded video files are stored |
-| `PATH_VIDEOS_MONTAGE_CLIPS` | Temp clip output directory for montage creation |
-| `PATH_VIDEOS_MONTAGE_COMPLETE` | Final montage output directory |
-| `URL_LOCAL_KV_API_FOR_VIDEO_MONTAGE_MAKER` | API base URL used for montage completion callback |
-| `PATH_TO_LOGS` | Winston log file directory |
+| Variable                                   | Purpose                                            |
+| ------------------------------------------ | -------------------------------------------------- |
+| `PORT`                                     | HTTP listen port (default: 8003)                   |
+| `REDIS_HOST` / `REDIS_PORT`                | Redis connection                                   |
+| `PATH_DATABASE` / `NAME_DB`                | SQLite database location                           |
+| `YOUTUBE_UPLOADER_QUEUE_NAME`              | YouTube upload queue name (`YouTubeUploadProcess`) |
+| `NAME_KV_VIDEO_MONTAGE_MAKER_QUEUE`        | Montage queue name                                 |
+| `YOUTUBE_CLIENT_ID`                        | Google OAuth2 client ID                            |
+| `YOUTUBE_CLIENT_SECRET`                    | Google OAuth2 client secret                        |
+| `YOUTUBE_REDIRECT_URI`                     | Google OAuth2 redirect URI                         |
+| `YOUTUBE_REFRESH_TOKEN`                    | Long-lived refresh token for YouTube API           |
+| `PATH_VIDEOS_UPLOADED`                     | Directory where uploaded video files are stored    |
+| `PATH_VIDEOS_MONTAGE_CLIPS`                | Temp clip output directory for montage creation    |
+| `PATH_VIDEOS_MONTAGE_COMPLETE`             | Final montage output directory                     |
+| `URL_LOCAL_KV_API_FOR_VIDEO_MONTAGE_MAKER` | API base URL used for montage completion callback  |
+| `PATH_TO_LOGS`                             | Winston log file directory                         |
 
 `PATH_TO_YOUTUBE_UPLOADER_SERVICE` has been removed — YouTube upload runs natively.
 `PATH_TO_VIDEO_MONTAGE_MAKER_SERVICE` has been removed — montage creation runs natively.

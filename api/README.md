@@ -39,7 +39,7 @@ PATH_PROFILE_PICTURES_PLAYER_DIR=/Users/nick/Documents/_project_resources/KyberV
 
 ```
 .
-├── CLAUDE.md
+├── AGENT.md
 ├── dist
 │   ├── app.js
 │   ├── modules

@@ -67,9 +67,9 @@ This is a straightforward migration. The uploader is ~60 lines of active code sp
 
 ## Phase 6 — Cleanup & Documentation
 
-- [ ] Update `worker-node/CLAUDE.md` to reflect that YouTube upload logic now lives in `src/modules/youtubeUploadService.ts` and that no external microservice is required
-- [ ] Remove `PATH_TO_YOUTUBE_UPLOADER_SERVICE` from the environment variable table in `worker-node/CLAUDE.md`
-- [ ] Update the root `CLAUDE.md` service communication diagram to show that worker-node handles YouTube upload directly instead of spawning a child process
+- [ ] Update `worker-node/AGENT.md` to reflect that YouTube upload logic now lives in `src/modules/youtubeUploadService.ts` and that no external microservice is required
+- [ ] Remove `PATH_TO_YOUTUBE_UPLOADER_SERVICE` from the environment variable table in `worker-node/AGENT.md`
+- [ ] Update the root `AGENT.md` service communication diagram to show that worker-node handles YouTube upload directly instead of spawning a child process
 - [ ] Archive or delete `KyberVision22YouTubeUploader/` — it is no longer part of the active workflow. If kept for reference, add a clearly visible deprecation notice to its `README.md`
 
 ---
@@ -78,9 +78,9 @@ This is a straightforward migration. The uploader is ~60 lines of active code sp
 
 These are design choices resolved before implementation:
 
-| #   | Question                                                                            | Decision                                                 |
-| --- | ----------------------------------------------------------------------------------- | -------------------------------------------------------- |
-| 1   | Should the YouTube video title remain the raw filename?                             | Yes — filename is used as-is                             |
-| 2   | Should the privacy status remain `"unlisted"`?                                      | Yes                                                      |
-| 3   | Keep the queue name `KyberVision23YouTubeUploader` or rename?                       | Rename to `YouTubeUploadProcess`                         |
-| 4   | Should `youtubeUploadService.ts` live in `modules/` or a new `services/` directory? | `modules/` to stay consistent with existing structure    |
+| #   | Question                                                                            | Decision                                              |
+| --- | ----------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| 1   | Should the YouTube video title remain the raw filename?                             | Yes — filename is used as-is                          |
+| 2   | Should the privacy status remain `"unlisted"`?                                      | Yes                                                   |
+| 3   | Keep the queue name `KyberVision23YouTubeUploader` or rename?                       | Rename to `YouTubeUploadProcess`                      |
+| 4   | Should `youtubeUploadService.ts` live in `modules/` or a new `services/` directory? | `modules/` to stay consistent with existing structure |

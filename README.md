@@ -14,7 +14,7 @@ The integrated worker-node service consolidates queue management and media proce
 
 ```
 .
-├── CLAUDE.md               - AI assistant guidance for this monorepo
+├── AGENT.md               - AI assistant guidance for this monorepo
 ├── README.md
 ├── api/                    - Express.js REST API (TypeScript)
 │   ├── src/
@@ -115,5 +115,5 @@ Key inter-service variables:
 
 - [`docs/API_REFERENCE.md`](./docs/API_REFERENCE.md) — full endpoint reference
 - [`docs/PROJECT_OVERVIEW.md`](./docs/PROJECT_OVERVIEW.md) — architecture and data flow
-- [`CLAUDE.md`](./CLAUDE.md) — guidance for AI-assisted development
-- Per-service `CLAUDE.md` files in `api/`, `worker-node/`
+- [`AGENT.md`](./AGENT.md) — guidance for AI-assisted development
+- Per-service `AGENT.md` files in `api/`, `worker-node/`

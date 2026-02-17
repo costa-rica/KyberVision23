@@ -1,4 +1,4 @@
-# CLAUDE.md
+# AGENT.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -6,14 +6,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 KyberVision23 is a sports video analysis platform with four independent packages. There is no root `package.json` — each package has its own `node_modules` and must be managed separately.
 
-| Package | Language | Port | Purpose |
-|---|---|---|---|
-| `api/` | TypeScript / Express | 3000 | REST API, all business logic |
-| `db-models/` | TypeScript | — | Shared Sequelize models (library only) |
-| `web-manager/` | JavaScript / Next.js | 3001 | Frontend |
-| `worker-node/` | TypeScript / Express | 8003 | BullMQ job queue orchestrator |
+| Package        | Language             | Port | Purpose                                |
+| -------------- | -------------------- | ---- | -------------------------------------- |
+| `api/`         | TypeScript / Express | 3000 | REST API, all business logic           |
+| `db-models/`   | TypeScript           | —    | Shared Sequelize models (library only) |
+| `web-manager/` | JavaScript / Next.js | 3001 | Frontend                               |
+| `worker-node/` | TypeScript / Express | 8003 | BullMQ job queue orchestrator          |
 
-Each package (`api/`, `worker-node/`) has its own `CLAUDE.md` with package-specific commands.
+Each package (`api/`, `worker-node/`) has its own `AGENT.md` with package-specific commands.
 
 ## Development Commands
 
@@ -39,6 +39,7 @@ cd db-models && npm run build
 All Node.js services depend on `@kybervision/db` via `"file:../db-models"`. After changing any model in `db-models/src/`, run `npm run build` in `db-models/` before restarting dependent services. The compiled output in `db-models/dist/` is what gets imported.
 
 Import pattern used in `api/` and `worker-node/`:
+
 ```typescript
 import { initModels, sequelize, User, Video, ... } from "@kybervision/db";
 ```
@@ -66,6 +67,7 @@ External microservices (YouTubeUploader, VideoMontageMaker)
 All Node.js services use Winston via a `modules/logger.ts` singleton that must be imported **before** any other module (including routes). The logger must be initialized immediately after `dotenv.config()`.
 
 Behavior by `NODE_ENV`:
+
 - `development` — console only
 - `testing` — console + rotating log files at `PATH_TO_LOGS`
 - `production` — log files only

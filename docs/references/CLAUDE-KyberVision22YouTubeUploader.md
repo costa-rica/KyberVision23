@@ -1,4 +1,4 @@
-# CLAUDE.md
+# AGENT.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -15,6 +15,7 @@ node index.js --filename <filename> --videoId <videoId>
 ```
 
 Both arguments are required:
+
 - `--filename` (alias `-f`): Name of the video file in the PATH_VIDEOS_UPLOADED directory
 - `--videoId` (alias `-v`): Database ID of the video record to update
 
@@ -54,6 +55,7 @@ YOUTUBE_REFRESH_TOKEN=your_refresh_token
 **Database Initialization**: The `kybervision22db` package requires explicit initialization before use. Always call `initModels()` from the package at the start of any function that accesses database models (see modules/uploader.js:10).
 
 **Video Upload Process** (modules/uploader.js:7-58):
+
 1. Initialize database models with `initModels()`
 2. Create OAuth2 client with YouTube credentials
 3. Upload video using `youtube.videos.insert()` with:
@@ -71,6 +73,7 @@ YOUTUBE_REFRESH_TOKEN=your_refresh_token
 This service depends on the `kybervision22db` package (local file dependency at `../KyberVision22Db`).
 
 **Video Table Fields Updated**:
+
 - `youTubeVideoId`: The YouTube video ID returned after successful upload
 - `processingCompleted`: Boolean flag set to true upon successful upload
 
@@ -79,6 +82,7 @@ This service depends on the `kybervision22db` package (local file dependency at 
 ## Authentication Setup
 
 YouTube OAuth2 credentials must be obtained separately using the YouTubeOAuth2AuthorizerApp:
+
 - Repository: https://github.com/costa-rica/YouTubeOAuth2AuthorizerApp
 - This is a one-time setup to obtain refresh tokens for the .env file
 

@@ -1,4 +1,4 @@
-# CLAUDE.md
+# AGENT.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -40,9 +40,12 @@ src/
 **Route file structure**: each route file creates its own `express.Router()` and is mounted in `app.ts` under a prefix (e.g. `/admin-db`, `/teams`).
 
 **File uploads**: multer is configured with `dest` pointing to `PATH_PROJECT_RESOURCES/uploads-delete-ok/`. This directory is created on startup by `verifyCheckDirectoryExists`. When wrapping `upload.single()`, always use the explicit callback form to catch multer errors:
+
 ```typescript
 upload.single("fieldName")(req, res, (err) => {
-  if (err) { /* handle */ }
+  if (err) {
+    /* handle */
+  }
   next();
 });
 ```

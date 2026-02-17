@@ -11,7 +11,7 @@ The app is built using React Native and Expo and TypeScript. Volley ball trainin
 ```
 .
 ├── app.json
-├── CLAUDE.md
+├── AGENT.md
 ├── docs
 ├── eslint.config.js
 ├── metro.config.js
