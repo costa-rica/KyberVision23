@@ -292,6 +292,7 @@ export default function ScriptingLive({ navigation }: ScriptingLiveProps) {
     if (tapIsActive) {
       const timestamp = new Date().toISOString();
       const { x, y, absoluteX, absoluteY } = event;
+      console.log(`[DEBUG TAP] event x=${x}, y=${y}, absoluteX=${absoluteX}, absoluteY=${absoluteY}, tapIsActive=${tapIsActive}, orientation=${orientation}`);
       if (orientation == "portrait") {
         const xPosPortait = x - userReducer.circleRadiusOuter;
         const yPosPortait =
@@ -307,17 +308,21 @@ export default function ScriptingLive({ navigation }: ScriptingLiveProps) {
         console.log(
           `scriptReducer.coordsScriptLivePortraitVwPlayerSuperSpacer.height: ${scriptReducer.coordsScriptLivePortraitVwPlayerSuperSpacer.height}`
         );
+        console.log(`[DEBUG TAP] containerMiddle=${JSON.stringify(scriptReducer.coordsScriptLivePortraitContainerMiddle)}`);
+        console.log(`[DEBUG TAP] spacer=${JSON.stringify(scriptReducer.coordsScriptLivePortraitVwPlayerSuperSpacer)}`);
+        const gatePass = y > scriptReducer.coordsScriptLivePortraitVwPlayerSuperSpacer.height!;
+        console.log(`[DEBUG TAP] gate check: y(${y}) > spacerHeight(${scriptReducer.coordsScriptLivePortraitVwPlayerSuperSpacer.height}) = ${gatePass}`);
         setTapDetails({
           timestamp,
           padPosCenterX: xPosPortait,
           padPosCenterY: yPosPortait,
         });
 
-        if (
-          y > scriptReducer.coordsScriptLivePortraitVwPlayerSuperSpacer.height!
-        ) {
+        if (gatePass) {
           setPadVisible(true);
           setTapIsActive(false);
+        } else {
+          console.log(`[DEBUG TAP] BLOCKED by gate - tap in spacer zone`);
         }
       } else {
         // Landscape
@@ -459,20 +464,24 @@ export default function ScriptingLive({ navigation }: ScriptingLiveProps) {
 
       // Determine position portrait
       if (orientation == "portrait") {
+        const yThreshold = scriptReducer.coordsScriptLivePortraitContainerMiddle.y! +
+          scriptReducer.coordsScriptLivePortraitContainerMiddle.height! * 0.5;
+        const xThreshold33 = scriptReducer.coordsScriptLivePortraitContainerMiddle.width! * 0.33;
+        const xThreshold66 = scriptReducer.coordsScriptLivePortraitContainerMiddle.width! * 0.66;
+        console.log(`[DEBUG SWIPE_END] tapXAdjusted=${tapXAdjusted}, tapYAdjusted=${tapYAdjusted}`);
+        console.log(`[DEBUG SWIPE_END] yThreshold=${yThreshold} (containerMiddle.y=${scriptReducer.coordsScriptLivePortraitContainerMiddle.y} + height*0.5=${scriptReducer.coordsScriptLivePortraitContainerMiddle.height! * 0.5})`);
+        console.log(`[DEBUG SWIPE_END] xThreshold33=${xThreshold33}, xThreshold66=${xThreshold66}`);
+        console.log(`[DEBUG SWIPE_END] isBackRow=${tapYAdjusted > yThreshold}`);
         if (
-          tapYAdjusted >
-          scriptReducer.coordsScriptLivePortraitContainerMiddle.y! +
-            scriptReducer.coordsScriptLivePortraitContainerMiddle.height! * 0.5
+          tapYAdjusted > yThreshold
         ) {
           if (
-            tapXAdjusted >
-            scriptReducer.coordsScriptLivePortraitContainerMiddle.width! * 0.66
+            tapXAdjusted > xThreshold66
           ) {
             // lastActionPositionIndexRef.current = 1;
             lastActionAreaIndexRef.current = 1;
           } else if (
-            tapXAdjusted >
-            scriptReducer.coordsScriptLivePortraitContainerMiddle.width! * 0.33
+            tapXAdjusted > xThreshold33
           ) {
             // lastActionPositionIndexRef.current = 6;
             lastActionAreaIndexRef.current = 6;
@@ -481,14 +490,12 @@ export default function ScriptingLive({ navigation }: ScriptingLiveProps) {
           }
         } else {
           if (
-            tapXAdjusted >
-            scriptReducer.coordsScriptLivePortraitContainerMiddle.width! * 0.66
+            tapXAdjusted > xThreshold66
           ) {
             // lastActionPositionIndexRef.current = 2;
             lastActionAreaIndexRef.current = 2;
           } else if (
-            tapXAdjusted >
-            scriptReducer.coordsScriptLivePortraitContainerMiddle.width! * 0.33
+            tapXAdjusted > xThreshold33
           ) {
             // lastActionPositionIndexRef.current = 3;
             lastActionAreaIndexRef.current = 3;
@@ -496,6 +503,7 @@ export default function ScriptingLive({ navigation }: ScriptingLiveProps) {
             lastActionAreaIndexRef.current = 4;
           }
         }
+        console.log(`[DEBUG SWIPE_END] area=${lastActionAreaIndexRef.current}, type=${scriptReducer.typesArray[lastActionTypeIndexRef.current!]}, quality=${scriptReducer.qualityArrayOuterCircle[lastActionQualityIndexRef.current!]}`);
       } else {
         console.log(`tapXAdjusted: ${tapXAdjusted}`);
         console.log(
