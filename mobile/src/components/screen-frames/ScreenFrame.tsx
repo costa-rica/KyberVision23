@@ -4,6 +4,7 @@ import {
 	Image,
 	TouchableWithoutFeedback,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import React, { type ReactNode } from "react";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import type {
@@ -32,13 +33,14 @@ export default function ScreenFrame({
 		useStateSetter: () => {},
 	},
 }: Props) {
+	const insets = useSafeAreaInsets();
 	const navigation = useNavigation<NavigationProp<ParamListBase>>();
 	const route = useRoute<RouteProp<ParamListBase, string>>();
 	const handleBackPress = async () => {
 		navigation.goBack();
 	};
 	return (
-		<View style={styles.container}>
+		<View style={[styles.container, { paddingBottom: insets.bottom }]}>
 			<View style={styles.containerTop}>
 				<Image
 					source={require("../../assets/images/screen-frame/imgBackgroundBottomFade.png")}

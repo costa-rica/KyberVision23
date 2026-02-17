@@ -7,6 +7,7 @@ import {
   ViewStyle,
 } from "react-native";
 import { ReactNode } from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ButtonKvImage from "../buttons/ButtonKvImage";
 import ButtonKvNoDefault from "../buttons/ButtonKvNoDefault";
 import BackArrow from "../../assets/images/screen-frame/btnBackArrow.svg";
@@ -44,7 +45,7 @@ export default function ScreenFrameWithTopChildrenSmallLandscape({
   },
   onBackPress = () => true,
 }: ScreenFrameWithTopChildrenSmallLandscapeProps) {
-  
+  const insets = useSafeAreaInsets();
   const handleBackPress = async () => {
     const goBack = await onBackPress();
     if (goBack) {
@@ -89,7 +90,7 @@ export default function ScreenFrameWithTopChildrenSmallLandscape({
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingBottom: insets.bottom }]}>
       <View style={stylesContainerTop}>
         <View style={stylesVwTopChildren}>
           {topChildren}

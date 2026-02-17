@@ -6,6 +6,7 @@ import {
 	Text,
 	TouchableWithoutFeedback,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ButtonKvImage from "../buttons/ButtonKvImage";
 import BackArrow from "../../assets/images/screen-frame/btnBackArrow.svg";
 import { useSelector } from "react-redux";
@@ -34,6 +35,7 @@ export default function ScreenFrameWithTopChildren({
 		return true;
 	},
 }: ScreenFrameWithTopChildrenProps) {
+	const insets = useSafeAreaInsets();
 	// Note: uploadReducer not implemented yet, so commenting out for now
 	// const uploadReducer = useSelector((state: RootState) => state.upload);
 
@@ -45,7 +47,7 @@ export default function ScreenFrameWithTopChildren({
 	};
 
 	return (
-		<View style={styles.container}>
+		<View style={[styles.container, { paddingBottom: insets.bottom }]}>
 			<View style={styles.containerTop}>
 				<Image
 					source={require("../../assets/images/screen-frame/imgBackgroundBottomFade.png")}

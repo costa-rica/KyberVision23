@@ -36,6 +36,7 @@ import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import { store, persistor } from "../types/store";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { useState, useEffect } from "react";
 import * as Font from "expo-font";
@@ -74,6 +75,7 @@ const Index = () => {
 	}
 	return (
 		<Provider store={store}>
+			<SafeAreaProvider>
 			<GestureHandlerRootView style={{ flex: 1 }}>
 				<PersistGate persistor={persistor}>
 					<NavigationContainer>
@@ -122,6 +124,7 @@ const Index = () => {
 					</NavigationContainer>
 				</PersistGate>
 			</GestureHandlerRootView>
+			</SafeAreaProvider>
 		</Provider>
 	);
 };

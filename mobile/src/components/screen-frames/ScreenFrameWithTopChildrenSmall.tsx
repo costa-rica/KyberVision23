@@ -7,6 +7,7 @@ import {
 	ViewStyle,
 } from "react-native";
 import React, { ReactNode } from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ButtonKvImage from "../buttons/ButtonKvImage";
 import BackArrow from "../../assets/images/screen-frame/btnBackArrow.svg";
 import Tribe from "../../assets/images/welcome/Tribe.svg";
@@ -44,6 +45,7 @@ export default function TemplateViewWithTopChildrenSmall({
 		return true;
 	},
 }: TemplateViewWithTopChildrenSmallProps) {
+	const insets = useSafeAreaInsets();
 	const handleBackPress = async () => {
 		const goBack = await onBackPress();
 		if (goBack) {
@@ -52,7 +54,7 @@ export default function TemplateViewWithTopChildrenSmall({
 	};
 
 	return (
-		<View style={styles.container}>
+		<View style={[styles.container, { paddingBottom: insets.bottom }]}>
 			<View style={[styles.containerTop, { height: topHeight } as ViewStyle]}>
 				<Image
 					source={require("../../assets/images/screen-frame/imgBackgroundBottomFade.png")}
