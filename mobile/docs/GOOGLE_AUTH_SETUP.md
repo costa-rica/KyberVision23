@@ -6,11 +6,11 @@ This document explains how to configure Google Sign-In for the KyberVision mobil
 
 Google Sign-In requires three separate OAuth 2.0 clients registered in Google Cloud Console — one per platform. Each serves a different purpose:
 
-| Client Type | Used By | Passed to SDK? |
-|---|---|---|
-| **Web** | Android (to get `idToken`) | Yes — `webClientId` in `configure()` |
-| **iOS** | iOS native sign-in flow | Yes — `iosClientId` in `configure()` |
-| **Android** | Google backend identity verification | No — registered only, never referenced in code |
+| Client Type | Used By                              | Passed to SDK?                                 |
+| ----------- | ------------------------------------ | ---------------------------------------------- |
+| Web         | Android (to get `idToken`)           | Yes — `webClientId` in `configure()`           |
+| iOS         | iOS native sign-in flow              | Yes — `iosClientId` in `configure()`           |
+| Android     | Google backend identity verification | No — registered only, never referenced in code |
 
 All three clients live in the same Google Cloud project (`kybervision23`).
 
@@ -24,20 +24,32 @@ All three clients live in the same Google Cloud project (`kybervision23`).
 
 ---
 
-## Step 1 — Get the Android SHA-1 Fingerprint from EAS
+## Step 1 — Get the Android SHA-1 Fingerprint(s)
 
-The SHA-1 fingerprint of the EAS-managed Android keystore is required to register the Android OAuth client.
+You may need **two different SHA-1s** depending on your distribution method:
+
+### For preview builds (APK, direct install)
+
+The EAS keystore SHA-1 is used because the APK is signed directly with it.
 
 ```bash
 cd mobile
 eas credentials
 ```
 
-- Select build profile: **preview** (or whichever profile you are configuring)
+- Select build profile: **preview**
 - Select platform: **Android**
 - The SHA-1 is displayed in the **Keystore** section under `SHA1 Fingerprint`
 
-Copy it — you will need it in Step 3.
+### For production builds (AAB, via Play Store)
+
+When distributed through Google Play with Play App Signing, Google **re-signs** the app with their own key. The SHA-1 on the user's device is different from the EAS keystore.
+
+1. Go to **Google Play Console** → your app
+2. Navigate to **Test and release → App integrity → App signing**
+3. Under **"App signing key certificate"**, copy the **SHA-1 certificate fingerprint**
+
+Copy the relevant SHA-1(s) — you will need them in Step 3. If you need Google Sign-In for both preview and production, you will create two Android OAuth clients (one per SHA-1).
 
 ---
 
@@ -131,10 +143,10 @@ eas build --platform ios --profile preview
 
 ## Current Credential IDs (as of Feb 2026)
 
-| Type | Client ID |
-|---|---|
-| Web | `572642369359-a521vfajfri9c7u92fhoc2k6fo7vq4hp.apps.googleusercontent.com` |
-| iOS | `572642369359-5clos44hddg7afhkrgconc0anm878svd.apps.googleusercontent.com` |
+| Type    | Client ID                                                                  |
+| ------- | -------------------------------------------------------------------------- |
+| Web     | `572642369359-a521vfajfri9c7u92fhoc2k6fo7vq4hp.apps.googleusercontent.com` |
+| iOS     | `572642369359-5clos44hddg7afhkrgconc0anm878svd.apps.googleusercontent.com` |
 | Android | `572642369359-k7f9pe5gnc0flk20l1ko3bta0fh8cl41.apps.googleusercontent.com` |
 
 ---
@@ -143,11 +155,25 @@ eas build --platform ios --profile preview
 
 ### Error code 10 (`DEVELOPER_ERROR`) on Android
 
-The app's SHA-1 fingerprint or package name is not registered in Google Cloud Console.
+The app's SHA-1 fingerprint or package name is not registered in Google Cloud Console. The most common cause is using the wrong SHA-1.
 
-- Verify the Android OAuth client exists with the correct package name (`com.costarica.kybervisionmobile23`) and the SHA-1 from your EAS keystore
-- Verify the `webClientId` in `.env` matches the Web OAuth client
-- A new EAS build is required after any credential changes
+**There are two different SHA-1 fingerprints depending on how the build is distributed:**
+
+| Distribution                         | SHA-1 Source                | Where to Find It                                                                                             |
+| ------------------------------------ | --------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| **Preview** (APK, direct install)    | EAS keystore                | `eas credentials` → Android → Keystore → SHA1 Fingerprint                                                    |
+| **Production** (AAB, via Play Store) | Google Play app signing key | Google Play Console → Test and release → App integrity → App signing → "App signing key certificate" → SHA-1 |
+
+When you upload an AAB to Google Play, Google **re-signs** it with their own certificate (Play App Signing). The SHA-1 on the user's device is the Play Store key, not the EAS upload key. This means the Android OAuth client in Google Cloud Console must use the **Play Store SHA-1** for production builds.
+
+If you need Google Sign-In to work in both preview and production, create **two Android OAuth clients** in Google Cloud Console — one with each SHA-1. Both use the same package name (`com.costarica.kybervisionmobile23`).
+
+**Checklist:**
+
+- Verify the Android OAuth client(s) exist with the correct package name and the correct SHA-1 for your distribution method
+- Verify `EXPO_PUBLIC_GOOGLE_SIGNIN_WEB_CLIENT_ID` matches the **Web** OAuth client ID (not Android or iOS)
+- No rebuild is needed after updating OAuth clients in Google Cloud Console — the fix takes effect at runtime
+- Changes may take a few minutes to propagate on Google's side
 
 ### Error `EXPO_GO_UNSUPPORTED`
 
