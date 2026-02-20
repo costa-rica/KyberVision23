@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { useSelector } from 'react-redux'
 import { useTheme } from 'next-themes'
 import { Button } from '@/components/ui/button'
 import { LoginModal } from '@/components/modals/login-modal'
@@ -9,22 +10,30 @@ import { RegisterModal } from '@/components/modals/register-modal'
 import { ForgotPasswordModal } from '@/components/modals/forgot-password-modal'
 import { Database, Sun, Moon } from 'lucide-react'
 import { Footer } from '@/components/footer'
+import type { RootState } from '@/store/store'
 
 type ModalView = 'none' | 'login' | 'register' | 'forgot-password'
 
 export default function LandingPage() {
   const [activeModal, setActiveModal] = useState<ModalView>('none')
   const router = useRouter()
+  const token = useSelector((state: RootState) => state.auth.token)
   const { resolvedTheme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => setMounted(true), [])
 
+  useEffect(() => {
+    if (token) {
+      router.replace('/user-growth')
+    }
+  }, [token, router])
+
   const isDark = resolvedTheme === 'dark'
 
   const handleAuthSuccess = () => {
     setActiveModal('none')
-    router.push('/dashboard')
+    router.push('/user-growth')
   }
 
   return (

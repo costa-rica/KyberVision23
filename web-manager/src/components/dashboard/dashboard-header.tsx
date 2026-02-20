@@ -16,10 +16,20 @@ import {
   SheetDescription,
   SheetClose,
 } from '@/components/ui/sheet'
-import { LogOut, Menu, Database, HardDrive, Video, Sun, Moon } from 'lucide-react'
+import {
+  LogOut,
+  Menu,
+  Database,
+  HardDrive,
+  Video,
+  Sun,
+  Moon,
+  ChartNoAxesCombined,
+} from 'lucide-react'
 
 const NAV_ITEMS = [
-  { href: '/dashboard', label: 'Home', icon: Database },
+  { href: '/user-growth', label: 'User Growth', icon: ChartNoAxesCombined },
+  { href: '/database-tables', label: 'Database Tables', icon: Database },
   { href: '/db-backups', label: 'Db Backups', icon: HardDrive },
   { href: '/manage-videos', label: 'Manage Videos', icon: Video },
 ]

@@ -336,4 +336,53 @@ router.post(
   },
 );
 
+// GET /users/user-growth-timeseries
+router.get(
+  "/user-growth-timeseries",
+  authenticateToken,
+  async (_req: Request, res: Response) => {
+    try {
+      const users = await User.findAll({
+        attributes: ["createdAt"],
+        order: [["createdAt", "ASC"]],
+      });
+
+      const dailyNewUsers = new Map<string, number>();
+
+      for (const user of users) {
+        const createdAt = user.get("createdAt") as Date | string | null;
+        if (!createdAt) continue;
+
+        const dateKey = new Date(createdAt).toISOString().slice(0, 10);
+        dailyNewUsers.set(dateKey, (dailyNewUsers.get(dateKey) ?? 0) + 1);
+      }
+
+      let runningTotal = 0;
+      const series = Array.from(dailyNewUsers.entries())
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([date, newUsers]) => {
+          runningTotal += newUsers;
+
+          return {
+            date,
+            newUsers,
+            totalUsers: runningTotal,
+          };
+        });
+
+      res.status(200).json({
+        series,
+        summary: {
+          totalUsers: users.length,
+          firstJoinDate: series[0]?.date ?? null,
+          lastJoinDate: series[series.length - 1]?.date ?? null,
+        },
+      });
+    } catch (error) {
+      logger.error("Error in /users/user-growth-timeseries:", error);
+      res.status(500).json({ error: "Failed to fetch user growth timeseries." });
+    }
+  },
+);
+
 export default router;
