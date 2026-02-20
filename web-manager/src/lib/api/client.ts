@@ -17,7 +17,11 @@ apiClient.interceptors.request.use((config) => {
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const status = error.response?.status;
+    const requestUrl = error.config?.url as string | undefined;
+    const isLoginRequest = typeof requestUrl === "string" && requestUrl.includes("/users/login");
+
+    if (status === 401 && !isLoginRequest) {
       store.dispatch(logout());
       if (typeof window !== "undefined") {
         window.location.href = "/";
