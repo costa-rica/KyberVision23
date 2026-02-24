@@ -79,15 +79,15 @@ api/tests/
 
 | # | Method | Path | Auth | Test Description | Status |
 |---|--------|------|------|-----------------|--------|
-| 1 | GET | `/teams` | Yes | Returns 200 with `{ result: true, teams }` | [ ] |
-| 2 | GET | `/teams` | Yes | Returns 401 without auth token | [ ] |
-| 3 | POST | `/teams/create` | Yes | Returns 200 with `{ result: true, teamNew }` on valid input | [ ] |
-| 4 | POST | `/teams/create` | Yes | Creates team with players when `playersArray` provided | [ ] |
-| 5 | POST | `/teams/update-visibility` | Yes | Returns 200 with `{ result: true, team }` | [ ] |
-| 6 | POST | `/teams/update-visibility` | Yes | Returns 404 when team not found | [ ] |
-| 7 | POST | `/teams/add-player` | Yes | Returns 200 with `{ result: true, playerNew }` | [ ] |
-| 8 | DELETE | `/teams/player` | Yes | Returns 200 with `{ result: true }` | [ ] |
-| 9 | GET | `/teams/public` | Yes | Returns 200 with `{ result: true, publicTeamsArray }` | [ ] |
+| 1 | GET | `/teams` | Yes | Returns 200 with `{ result: true, teams }` | [x] |
+| 2 | GET | `/teams` | Yes | Returns 401 without auth token | [x] |
+| 3 | POST | `/teams/create` | Yes | Returns 200 with `{ result: true, teamNew }` on valid input | [x] |
+| 4 | POST | `/teams/create` | Yes | Creates team with players when `playersArray` provided | [x] |
+| 5 | POST | `/teams/update-visibility` | Yes | Returns 200 with `{ result: true, team }` | [x] |
+| 6 | POST | `/teams/update-visibility` | Yes | Returns 404 when team not found | [x] |
+| 7 | POST | `/teams/add-player` | Yes | Returns 200 with `{ result: true, playerNew }` | [x] |
+| 8 | DELETE | `/teams/player` | Yes | Returns 200 with `{ result: true }` | [x] |
+| 9 | GET | `/teams/public` | Yes | Returns 200 with `{ result: true, publicTeamsArray }` | [x] |
 
 ### `sessions.test.ts` — prefix: `/sessions`
 
