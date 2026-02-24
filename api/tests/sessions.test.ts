@@ -55,7 +55,7 @@ beforeAll(async () => {
   // Import app after DB is ready
   const appModule = await import("../src/app");
   app = appModule.default;
-});
+}, 30000); // 30 second timeout for initialization
 
 beforeEach(async () => {
   // Clear all tables before each test - order matters for foreign keys
