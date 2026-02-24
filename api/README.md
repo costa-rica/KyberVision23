@@ -275,3 +275,40 @@ Tests run automatically on:
 - Pull request validation
 
 See `docs/TEST_IMPLEMENTATION_TODO.md` for detailed test implementation tracking.
+
+### Troubleshooting
+
+**Tests timeout when running `npm test`:**
+
+The test suite is configured to run serially (`maxWorkers: 1`) to avoid conflicts when initializing the app multiple times. This means tests will take longer but won't have resource conflicts.
+
+If tests still timeout:
+1. Increase the timeout in `jest.config.ts`:
+   ```typescript
+   testTimeout: 60000, // 60 seconds
+   ```
+
+2. Run tests in smaller batches:
+   ```bash
+   npm test -- tests/users.test.ts tests/teams.test.ts
+   ```
+
+3. Check that `NODE_ENV=testing` is set in your test environment
+
+**Individual test files work but full suite fails:**
+
+This usually indicates resource conflicts (database, ports, file system). The configuration has been set to run tests serially to prevent this.
+
+**Tests hang indefinitely:**
+
+Check for:
+- Unclosed database connections (should auto-close with `forceExit: true`)
+- Async operations without proper cleanup
+- Mocked functions not properly reset between tests
+
+**Performance Tips:**
+
+- Run specific test files during development: `npm test -- users.test.ts`
+- Use watch mode for TDD: `npm test -- --watch`
+- The full test suite takes ~2-5 minutes due to serial execution
+- Individual test files run in 5-15 seconds
