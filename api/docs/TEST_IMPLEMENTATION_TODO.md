@@ -93,13 +93,13 @@ api/tests/
 
 | # | Method | Path | Auth | Test Description | Status |
 |---|--------|------|------|-----------------|--------|
-| 1 | GET | `/sessions/:teamId` | Yes | Returns 200 with `{ result: true, sessionsArray }` | [ ] |
-| 2 | GET | `/sessions/:teamId` | Yes | Returns 401 without auth token | [ ] |
-| 3 | POST | `/sessions/create` | Yes | Returns 200 with `{ result: true, sessionNew }` on valid input | [ ] |
-| 4 | POST | `/sessions/create` | Yes | Returns 404 when contractLeagueTeamId not found | [ ] |
-| 5 | POST | `/sessions/review-selection-screen/get-actions` | Yes | Returns 200 with `{ result: true, actionsArray, playerDbObjectsArray }` | [ ] |
-| 6 | GET | `/sessions/scripting-sync-video/:sessionId/actions` | Yes | Returns 200 with `{ result: true, actionsArray }` | [ ] |
-| 7 | GET | `/sessions/scripting-sync-video-screen/get-actions-for-syncing/:sessionId` | Yes | Returns 200 with `{ result: true, actionsArrayByScript }` | [ ] |
+| 1 | GET | `/sessions/:teamId` | Yes | Returns 200 with `{ result: true, sessionsArray }` | [x] |
+| 2 | GET | `/sessions/:teamId` | Yes | Returns 401 without auth token | [x] |
+| 3 | POST | `/sessions/create` | Yes | Returns 200 with `{ result: true, sessionNew }` on valid input | [x] |
+| 4 | POST | `/sessions/create` | Yes | Returns 404 when contractLeagueTeamId not found | [x] |
+| 5 | POST | `/sessions/review-selection-screen/get-actions` | Yes | Returns 200 with `{ result: true, actionsArray, playerDbObjectsArray }` | [x] |
+| 6 | GET | `/sessions/scripting-sync-video/:sessionId/actions` | Yes | Returns 200 with `{ result: true, actionsArray }` | [x] |
+| 7 | GET | `/sessions/scripting-sync-video-screen/get-actions-for-syncing/:sessionId` | Yes | Returns 200 with `{ result: true, actionsArrayByScript }` | [x] |
 
 ### `players.test.ts` — prefix: `/players`
 
