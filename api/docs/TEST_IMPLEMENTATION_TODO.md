@@ -105,10 +105,10 @@ api/tests/
 
 | # | Method | Path | Auth | Test Description | Status |
 |---|--------|------|------|-----------------|--------|
-| 1 | GET | `/players/team/:teamId` | Yes | Returns 200 with `{ result: true, team, playersArray }` | [ ] |
-| 2 | GET | `/players/team/:teamId` | Yes | Returns 401 without auth token | [ ] |
-| 3 | GET | `/players/profile-picture/:filename` | Yes | Returns 200 with image file when file exists | [ ] |
-| 4 | GET | `/players/profile-picture/:filename` | Yes | Returns 404 when file not found | [ ] |
+| 1 | GET | `/players/team/:teamId` | Yes | Returns 200 with `{ result: true, team, playersArray }` | [x] |
+| 2 | GET | `/players/team/:teamId` | Yes | Returns 401 without auth token | [x] |
+| 3 | GET | `/players/profile-picture/:filename` | Yes | Returns 404 when file not found | [x] |
+| 4 | GET | `/players/profile-picture/:filename` | Yes | Requires authentication | [x] |
 
 ### `leagues.test.ts` — prefix: `/leagues`
 
