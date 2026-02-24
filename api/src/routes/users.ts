@@ -380,7 +380,9 @@ router.get(
       });
     } catch (error) {
       logger.error("Error in /users/user-growth-timeseries:", error);
-      res.status(500).json({ error: "Failed to fetch user growth timeseries." });
+      res
+        .status(500)
+        .json({ error: "Failed to fetch user growth timeseries." });
     }
   },
 );
