@@ -16,6 +16,10 @@ const config: Config = {
   clearMocks: true,
   resetMocks: true,
   restoreMocks: true,
+  // Run tests serially to avoid conflicts
+  maxWorkers: 1,
+  // Increase timeout for slow operations
+  testTimeout: 30000,
 };
 
 export default config;

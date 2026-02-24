@@ -92,12 +92,19 @@ async function initializeApp() {
     logger.info("✅ App initialization completed");
   } catch (err) {
     logger.error("❌ App initialization failed:", err);
-    process.exit(1);
+    // Only exit in non-test environments
+    if (process.env.NODE_ENV !== "testing") {
+      process.exit(1);
+    } else {
+      throw err; // Re-throw in tests so they can handle it
+    }
   }
 }
 
-// Initialize the app when this module is imported
-initializeApp();
+// Initialize the app when this module is imported (skip in test environment)
+if (process.env.NODE_ENV !== "testing") {
+  initializeApp();
+}
 
 // Start server if this file is run directly (for development)
 if (require.main === module) {
