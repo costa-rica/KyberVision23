@@ -114,76 +114,76 @@ api/tests/
 
 | # | Method | Path | Auth | Test Description | Status |
 |---|--------|------|------|-----------------|--------|
-| 1 | GET | `/leagues/team/:teamId` | Yes | Returns 200 with `{ leaguesArray }` | [ ] |
-| 2 | GET | `/leagues/team/:teamId` | Yes | Returns 401 without auth token | [ ] |
+| 1 | GET | `/leagues/team/:teamId` | Yes | Returns 200 with `{ leaguesArray }` | [x] |
+| 2 | GET | `/leagues/team/:teamId` | Yes | Returns 401 without auth token | [x] |
 
 ### `videos.test.ts` — prefix: `/videos`
 
 | # | Method | Path | Auth | Test Description | Status |
 |---|--------|------|------|-----------------|--------|
-| 1 | GET | `/videos` | Yes | Returns 200 with `{ result: true, videosArray }` | [ ] |
-| 2 | GET | `/videos` | Yes | Returns 401 without auth token | [ ] |
-| 3 | GET | `/videos/team/:teamId` | Yes | Returns 200 with `{ result: true, videosArray }` | [ ] |
-| 4 | GET | `/videos/user` | Yes | Returns 200 with `{ result: true, videosArray }` for current user | [ ] |
-| 5 | POST | `/videos/upload-youtube` | Yes | Returns 200 with `{ result: true, message }` (mock external calls) | [ ] |
-| 6 | POST | `/videos/upload-youtube` | Yes | Returns 400 when no file uploaded | [ ] |
-| 7 | DELETE | `/videos/:videoId` | Yes | Returns 200 with `{ message }` (mock YouTube delete) | [ ] |
-| 8 | DELETE | `/videos/:videoId` | Yes | Returns 404 when video not found | [ ] |
-| 9 | POST | `/videos/montage-service/queue-a-job` | Yes | Returns 200 with `{ result: true, message, data }` (mock worker-node) | [ ] |
-| 10 | POST | `/videos/montage-service/video-completed-notify-user` | Yes | Returns 200 with `{ result: true, message }` (mock email) | [ ] |
-| 11 | GET | `/videos/montage-service/play-video/:token` | No | Returns video file for valid token | [ ] |
-| 12 | GET | `/videos/montage-service/play-video/:token` | No | Returns 401 for invalid token | [ ] |
-| 13 | GET | `/videos/montage-service/download-video/:token` | No | Returns video file for download with valid token | [ ] |
+| 1 | GET | `/videos` | Yes | Returns 200 with `{ result: true, videosArray }` | [~] Skipped |
+| 2 | GET | `/videos` | Yes | Returns 401 without auth token | [~] Skipped |
+| 3 | GET | `/videos/team/:teamId` | Yes | Returns 200 with `{ result: true, videosArray }` | [~] Skipped |
+| 4 | GET | `/videos/user` | Yes | Returns 200 with `{ result: true, videosArray }` for current user | [~] Skipped |
+| 5 | POST | `/videos/upload-youtube` | Yes | Returns 200 with `{ result: true, message }` (mock external calls) | [~] Skipped |
+| 6 | POST | `/videos/upload-youtube` | Yes | Returns 400 when no file uploaded | [~] Skipped |
+| 7 | DELETE | `/videos/:videoId` | Yes | Returns 200 with `{ message }` (mock YouTube delete) | [~] Skipped |
+| 8 | DELETE | `/videos/:videoId` | Yes | Returns 404 when video not found | [~] Skipped |
+| 9 | POST | `/videos/montage-service/queue-a-job` | Yes | Returns 200 with `{ result: true, message, data }` (mock worker-node) | [~] Skipped |
+| 10 | POST | `/videos/montage-service/video-completed-notify-user` | Yes | Returns 200 with `{ result: true, message }` (mock email) | [x] |
+| 11 | GET | `/videos/montage-service/play-video/:token` | No | Returns video file for valid token | [x] |
+| 12 | GET | `/videos/montage-service/play-video/:token` | No | Returns 401 for invalid token | [x] |
+| 13 | GET | `/videos/montage-service/download-video/:token` | No | Returns video file for download with valid token | [x] |
 
 ### `scripts.test.ts` — prefix: `/scripts`
 
 | # | Method | Path | Auth | Test Description | Status |
 |---|--------|------|------|-----------------|--------|
-| 1 | POST | `/scripts/scripting-live-screen/receive-actions-array` | Yes | Returns 200 with `{ result: true, message, scriptId, actionsCount }` | [ ] |
-| 2 | POST | `/scripts/scripting-live-screen/receive-actions-array` | Yes | Returns 400 when actionsArray is empty | [ ] |
-| 3 | POST | `/scripts/scripting-live-screen/receive-actions-array` | Yes | Returns 401 without auth token | [ ] |
+| 1 | POST | `/scripts/scripting-live-screen/receive-actions-array` | Yes | Returns 200 with `{ result: true, message, scriptId, actionsCount }` | [x] |
+| 2 | POST | `/scripts/scripting-live-screen/receive-actions-array` | Yes | Returns 400 when actionsArray is empty | [x] |
+| 3 | POST | `/scripts/scripting-live-screen/receive-actions-array` | Yes | Returns 401 without auth token | [x] |
 
 ### `contractTeamUsers.test.ts` — prefix: `/contract-team-users`
 
 | # | Method | Path | Auth | Test Description | Status |
 |---|--------|------|------|-----------------|--------|
-| 1 | GET | `/contract-team-users` | Yes | Returns 200 with `{ teamsArray, contractTeamUserArray }` | [ ] |
-| 2 | GET | `/contract-team-users` | Yes | Returns 401 without auth token | [ ] |
-| 3 | POST | `/contract-team-users/create/:teamId` | Yes | Returns 201 with `{ message, contractTeamUser }` on new record | [ ] |
-| 4 | POST | `/contract-team-users/create/:teamId` | Yes | Returns 200 with `{ message, contractTeamUser }` on upsert | [ ] |
-| 5 | GET | `/contract-team-users/:teamId` | Yes | Returns 200 with `{ squadArray }` | [ ] |
-| 6 | POST | `/contract-team-users/add-squad-member` | Yes | Returns 201 when adding existing user to team (mock email) | [ ] |
-| 7 | POST | `/contract-team-users/add-squad-member` | Yes | Returns 200 when inviting non-existent user (creates PendingInvitation) | [ ] |
-| 8 | POST | `/contract-team-users/add-squad-member` | Yes | Returns 400 when user already on team | [ ] |
-| 9 | GET | `/contract-team-users/join/:joinToken` | Yes | Returns 200 with `{ result: true, contractTeamUser }` for valid token | [ ] |
-| 10 | GET | `/contract-team-users/join/:joinToken` | Yes | Returns 403 for invalid/expired token | [ ] |
-| 11 | POST | `/contract-team-users/toggle-role` | Yes | Returns 200 with `{ result: true, contractTeamUser }` | [ ] |
-| 12 | POST | `/contract-team-users/toggle-role` | Yes | Returns 404 when contract not found | [ ] |
-| 13 | DELETE | `/contract-team-users` | Yes | Returns 200 with `{ result: true, contractTeamUser }` | [ ] |
-| 14 | DELETE | `/contract-team-users` | Yes | Returns 404 when contract not found | [ ] |
+| 1 | GET | `/contract-team-users` | Yes | Returns 200 with `{ teamsArray, contractTeamUserArray }` | [x] |
+| 2 | GET | `/contract-team-users` | Yes | Returns 401 without auth token | [x] |
+| 3 | POST | `/contract-team-users/create/:teamId` | Yes | Returns 201 with `{ message, contractTeamUser }` on new record | [x] |
+| 4 | POST | `/contract-team-users/create/:teamId` | Yes | Returns 200 with `{ message, contractTeamUser }` on upsert | [x] |
+| 5 | GET | `/contract-team-users/:teamId` | Yes | Returns 200 with `{ squadArray }` | [x] |
+| 6 | POST | `/contract-team-users/add-squad-member` | Yes | Returns 201 when adding existing user to team (mock email) | [x] |
+| 7 | POST | `/contract-team-users/add-squad-member` | Yes | Returns 200 when inviting non-existent user (creates PendingInvitation) | [x] |
+| 8 | POST | `/contract-team-users/add-squad-member` | Yes | Returns 400 when user already on team | [x] |
+| 9 | GET | `/contract-team-users/join/:joinToken` | Yes | Returns 200 with `{ result: true, contractTeamUser }` for valid token | [x] |
+| 10 | GET | `/contract-team-users/join/:joinToken` | Yes | Returns 403 for invalid/expired token | [x] |
+| 11 | POST | `/contract-team-users/toggle-role` | Yes | Returns 200 with `{ result: true, contractTeamUser }` | [x] |
+| 12 | POST | `/contract-team-users/toggle-role` | Yes | Returns 404 when contract not found | [x] |
+| 13 | DELETE | `/contract-team-users` | Yes | Returns 200 with `{ result: true, contractTeamUser }` | [x] |
+| 14 | DELETE | `/contract-team-users` | Yes | Returns 404 when contract not found | [x] |
 
 ### `contractPlayerUsers.test.ts` — prefix: `/contract-player-users`
 
 | # | Method | Path | Auth | Test Description | Status |
 |---|--------|------|------|-----------------|--------|
-| 1 | POST | `/contract-player-users/link-user-to-player` | Yes | Returns 200 with `{ result: true, contractPlayerUserObject }` | [ ] |
-| 2 | POST | `/contract-player-users/link-user-to-player` | Yes | Returns 401 without auth token | [ ] |
-| 3 | DELETE | `/contract-player-users/:playerId` | Yes | Returns 200 with `{ result: true }` | [ ] |
+| 1 | POST | `/contract-player-users/link-user-to-player` | Yes | Returns 200 with `{ result: true, contractPlayerUserObject }` | [x] |
+| 2 | POST | `/contract-player-users/link-user-to-player` | Yes | Returns 401 without auth token | [x] |
+| 3 | DELETE | `/contract-player-users/:playerId` | Yes | Returns 200 with `{ result: true }` | [x] |
 
 ### `contractUserActions.test.ts` — prefix: `/contract-user-actions`
 
 | # | Method | Path | Auth | Test Description | Status |
 |---|--------|------|------|-----------------|--------|
-| 1 | POST | `/contract-user-actions/update-user-favorites` | Yes | Returns 200 with `{ result: true, message }` | [ ] |
-| 2 | POST | `/contract-user-actions/update-user-favorites` | Yes | Returns 401 without auth token | [ ] |
+| 1 | POST | `/contract-user-actions/update-user-favorites` | Yes | Returns 200 with `{ result: true, message }` | [x] |
+| 2 | POST | `/contract-user-actions/update-user-favorites` | Yes | Returns 401 without auth token | [x] |
 
 ### `contractVideoActions.test.ts` — prefix: `/contract-video-actions`
 
 | # | Method | Path | Auth | Test Description | Status |
 |---|--------|------|------|-----------------|--------|
-| 1 | POST | `/contract-video-actions/scripting-sync-video-screen/update-delta-time-all-actions-in-script` | Yes | Returns 200 with `{ result: true, message, scriptId, updatedCount }` | [ ] |
-| 2 | POST | `/contract-video-actions/scripting-sync-video-screen/update-delta-time-all-actions-in-script` | Yes | Returns 404 when script not found | [ ] |
-| 3 | POST | `/contract-video-actions/scripting-sync-video-screen/update-delta-time-all-actions-in-script` | Yes | Returns 401 without auth token | [ ] |
+| 1 | POST | `/contract-video-actions/scripting-sync-video-screen/update-delta-time-all-actions-in-script` | Yes | Returns 200 with `{ result: true, message, scriptId, updatedCount }` | [x] |
+| 2 | POST | `/contract-video-actions/scripting-sync-video-screen/update-delta-time-all-actions-in-script` | Yes | Returns 404 when script not found | [x] |
+| 3 | POST | `/contract-video-actions/scripting-sync-video-screen/update-delta-time-all-actions-in-script` | Yes | Returns 401 without auth token | [x] |
 
 ### `adminDb.test.ts` — prefix: `/admin-db`
 
@@ -212,7 +212,7 @@ api/tests/
 
 | # | Method | Path | Auth | Test Description | Status |
 |---|--------|------|------|-----------------|--------|
-| 1 | GET | `/` | No | Returns 200 with HTML content | [ ] |
+| 1 | GET | `/` | No | Returns 200 with HTML content | [x] |
 
 ---
 
