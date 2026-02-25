@@ -33,13 +33,13 @@ Commit changes with a message describing Phase 1 completion.
 
 > Establish the mocking strategy so `app.ts` can be imported without Redis/DB connections.
 
-- [ ] Create mock for `ioredis` (prevents real Redis connections)
-- [ ] Create mock for `bullmq` (Queue, Worker, Job stubs)
-- [ ] Create mock for `@kybervision/db` (initModels, sequelize.sync, Video model)
-- [ ] Create mock for `modules/logger` (silent winston)
-- [ ] Write `tests/app.test.ts` — verify app imports without errors, Express instance is created
-- [ ] Test `GET /` returns 200 (index route)
-- [ ] Test `GET /users` returns 200 (users placeholder)
+- [x] Create mock for `ioredis` (prevents real Redis connections)
+- [x] Create mock for `bullmq` (Queue, Worker, Job stubs)
+- [x] Create mock for `@kybervision/db` (initModels, sequelize.sync, Video model)
+- [x] Create mock for `modules/logger` (silent winston)
+- [x] Write `tests/app.test.ts` — verify app imports without errors, Express instance is created
+- [x] Test `GET /` returns 200 (index route)
+- [x] Test `GET /users` returns 200 (users placeholder)
 
 ### Stop Point 2
 
