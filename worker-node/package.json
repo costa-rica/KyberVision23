@@ -7,7 +7,9 @@
     "build": "node --max-old-space-size=4096 node_modules/.bin/tsc",
     "postbuild": "node scripts/copy-assets.js",
     "start": "node dist/server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --max-old-space-size=4096 node_modules/.bin/jest",
+    "test:watch": "node --max-old-space-size=4096 node_modules/.bin/jest --watch",
+    "test:coverage": "node --max-old-space-size=4096 node_modules/.bin/jest --coverage"
   },
   "keywords": [],
   "author": "",
@@ -36,9 +38,14 @@
     "@types/ejs": "^3.1.5",
     "@types/express": "^5.0.6",
     "@types/fluent-ffmpeg": "^2.1.24",
+    "@types/jest": "^30.0.0",
     "@types/morgan": "^1.9.10",
     "@types/node": "^25.2.3",
+    "@types/supertest": "^6.0.3",
+    "jest": "^30.2.0",
     "nodemon": "^3.1.11",
+    "supertest": "^7.2.2",
+    "ts-jest": "^29.4.6",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   }
