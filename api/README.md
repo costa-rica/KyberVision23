@@ -123,11 +123,13 @@ The API includes a comprehensive test suite using Jest and Supertest. Tests use 
 ### Running Tests
 
 **Run all tests:**
+
 ```bash
 npm test
 ```
 
 **Run a specific test file:**
+
 ```bash
 npm test -- users.test.ts
 npm test -- teams.test.ts
@@ -135,16 +137,19 @@ npm test -- sessions.test.ts
 ```
 
 **Run tests in watch mode:**
+
 ```bash
 npm test -- --watch
 ```
 
 **Run tests with coverage:**
+
 ```bash
 npm test -- --coverage
 ```
 
 **Run tests matching a pattern:**
+
 ```bash
 npm test -- --testNamePattern="should return 200"
 ```
@@ -174,12 +179,14 @@ api/tests/
 ### Test Configuration
 
 Tests use:
+
 - **In-memory SQLite database** - Fast, isolated tests with `storage: ":memory:"`
 - **Mocked external services** - Email, YouTube, worker-node HTTP calls
 - **Mocked logger** - Silent test execution
 - **Test helpers** - Factory functions for creating test data
 
 Configuration is in `jest.config.ts`:
+
 ```typescript
 {
   preset: "ts-jest",
@@ -194,21 +201,21 @@ Configuration is in `jest.config.ts`:
 
 **Current Status: 68 / 96 tests (71% coverage)**
 
-| Route | Tests | Status |
-|-------|-------|--------|
-| users | 16 | ✅ Complete |
-| teams | 9 | ✅ Complete |
-| sessions | 7 | ✅ Complete |
-| players | 4 | ✅ Complete |
-| leagues | 2 | ✅ Complete |
-| contractTeamUsers | 14 | ✅ Complete |
-| contractPlayerUsers | 3 | ✅ Complete |
-| scripts | 3 | ✅ Complete |
-| contractUserActions | 2 | ✅ Complete |
-| contractVideoActions | 3 | ✅ Complete |
-| videos | 4 passing, 9 skipped | ⚠️ Partial |
-| index | 1 | ✅ Complete |
-| adminDb | 0 | ⏸️ Todo |
+| Route                | Tests                | Status      |
+| -------------------- | -------------------- | ----------- |
+| users                | 16                   | ✅ Complete |
+| teams                | 9                    | ✅ Complete |
+| sessions             | 7                    | ✅ Complete |
+| players              | 4                    | ✅ Complete |
+| leagues              | 2                    | ✅ Complete |
+| contractTeamUsers    | 14                   | ✅ Complete |
+| contractPlayerUsers  | 3                    | ✅ Complete |
+| scripts              | 3                    | ✅ Complete |
+| contractUserActions  | 2                    | ✅ Complete |
+| contractVideoActions | 3                    | ✅ Complete |
+| videos               | 4 passing, 9 skipped | ⚠️ Partial  |
+| index                | 1                    | ✅ Complete |
+| adminDb              | 0                    | ⏸️ Todo     |
 
 ### Helper Functions
 
@@ -260,6 +267,7 @@ describe("GET /endpoint", () => {
 ### Skipped Tests
 
 Some tests in `videos.test.ts` are skipped due to complex external dependencies:
+
 - File upload handling (multer middleware)
 - YouTube API integration
 - Worker-node HTTP calls
@@ -270,6 +278,7 @@ These can be enhanced with more comprehensive mocking infrastructure.
 ### Continuous Integration
 
 Tests run automatically on:
+
 - Pre-commit (via git hooks, if configured)
 - CI/CD pipelines (GitHub Actions, etc.)
 - Pull request validation
@@ -283,12 +292,15 @@ See `docs/TEST_IMPLEMENTATION_TODO.md` for detailed test implementation tracking
 The test suite is configured to run serially (`maxWorkers: 1`) to avoid conflicts when initializing the app multiple times. This means tests will take longer but won't have resource conflicts.
 
 If tests still timeout:
+
 1. Increase the timeout in `jest.config.ts`:
+
    ```typescript
    testTimeout: 60000, // 60 seconds
    ```
 
 2. Run tests in smaller batches:
+
    ```bash
    npm test -- tests/users.test.ts tests/teams.test.ts
    ```
@@ -302,6 +314,7 @@ This usually indicates resource conflicts (database, ports, file system). The co
 **Tests hang indefinitely:**
 
 Check for:
+
 - Unclosed database connections (should auto-close with `forceExit: true`)
 - Async operations without proper cleanup
 - Mocked functions not properly reset between tests
