@@ -15,6 +15,7 @@ __pycache__/
 
 # Build outputs
 dist/
+!api/dist/  # Allow api/dist/ to be committed (pre-built for production)
 build/
 .next/
 
@@ -27,3 +28,4 @@ _logs/
 
 # Documents
 mobile/docs/google-credentials
+api/dist/.env
