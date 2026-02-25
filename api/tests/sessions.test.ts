@@ -218,12 +218,14 @@ describe("GET /sessions/scripting-sync-video/:sessionId/actions", () => {
       sessionId: session.id,
     });
 
+    const baseTime = new Date();
+
     await Action.create({
       scriptId: script.id,
       playerId: player.id,
       type: 1,
       quality: "good",
-      timestamp: new Date(),
+      timestamp: baseTime,
       area: "center",
       setNumber: 1,
       scoreTeamAnalyzed: 0,
@@ -235,7 +237,7 @@ describe("GET /sessions/scripting-sync-video/:sessionId/actions", () => {
       playerId: player.id,
       type: 2,
       quality: "excellent",
-      timestamp: new Date(),
+      timestamp: new Date(baseTime.getTime() + 1000), // 1 second later
       area: "left",
       setNumber: 1,
       scoreTeamAnalyzed: 0,
