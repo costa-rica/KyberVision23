@@ -1,13 +1,16 @@
 // app.ts — KyberVision23API
 import dotenv from "dotenv";
-dotenv.config();
+import path from "path";
+
+// Load .env from parent directory of dist/ (i.e., api/.env)
+// This ensures .env is found regardless of current working directory
+dotenv.config({ path: path.join(__dirname, "../.env") });
 
 // Logger must be initialized immediately after dotenv so all subsequent
 // modules can import it as a fully configured singleton.
 import logger from "./modules/logger";
 
 import express from "express";
-import path from "path";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import cors from "cors";

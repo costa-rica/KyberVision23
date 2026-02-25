@@ -5,12 +5,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 // app.ts — KyberVision23API
 const dotenv_1 = __importDefault(require("dotenv"));
-dotenv_1.default.config();
+const path_1 = __importDefault(require("path"));
+// Load .env from parent directory of dist/ (i.e., api/.env)
+// This ensures .env is found regardless of current working directory
+dotenv_1.default.config({ path: path_1.default.join(__dirname, "../.env") });
 // Logger must be initialized immediately after dotenv so all subsequent
 // modules can import it as a fully configured singleton.
 const logger_1 = __importDefault(require("./modules/logger"));
 const express_1 = __importDefault(require("express"));
-const path_1 = __importDefault(require("path"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const morgan_1 = __importDefault(require("morgan"));
 const cors_1 = __importDefault(require("cors"));
