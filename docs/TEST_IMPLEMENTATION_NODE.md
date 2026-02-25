@@ -7,6 +7,7 @@ This document outlines the testing patterns and architecture used across Node.js
 ## Testing Philosophy
 
 **Core principles:**
+
 - Tests run in isolated environments (in-memory databases, mocked services)
 - External dependencies are mocked to prevent side effects
 - Tests are fast, deterministic, and can run in CI/CD
@@ -14,6 +15,7 @@ This document outlines the testing patterns and architecture used across Node.js
 - Environment variables are managed safely (no secrets in git)
 
 **When to test:**
+
 - Automatically: GitHub Actions runs tests on every push/PR
 - Locally: Developers run tests before committing
 - Never on production servers
@@ -26,12 +28,12 @@ The API project uses Jest + Supertest for testing Express.js REST endpoints.
 
 ### Stack
 
-| Component | Technology | Purpose |
-|-----------|------------|---------|
-| Test Runner | Jest | Executes tests, assertions, mocking |
-| HTTP Testing | Supertest | Makes HTTP requests to Express app |
-| Database | In-memory SQLite | Fast, isolated database for each test run |
-| Mocking | jest.mock() | Mock external services (email, APIs, file system) |
+| Component    | Technology       | Purpose                                           |
+| ------------ | ---------------- | ------------------------------------------------- |
+| Test Runner  | Jest             | Executes tests, assertions, mocking               |
+| HTTP Testing | Supertest        | Makes HTTP requests to Express app                |
+| Database     | In-memory SQLite | Fast, isolated database for each test run         |
+| Mocking      | jest.mock()      | Mock external services (email, APIs, file system) |
 
 ### Project Structure
 
@@ -54,6 +56,7 @@ api/
 ```
 
 **Key conventions:**
+
 - Test files named `*.test.ts` (matches `testMatch` in jest.config.ts)
 - One test file per route file (e.g., `routes/users.ts` → `tests/users.test.ts`)
 - Shared setup in `setup.ts`, shared utilities in `helpers.ts`
@@ -66,29 +69,31 @@ api/
 import type { Config } from "jest";
 
 const config: Config = {
-  preset: "ts-jest",                    // TypeScript support
-  testEnvironment: "node",              // Node.js environment (not browser)
-  roots: ["<rootDir>/tests"],           // Test directory
-  testMatch: ["**/*.test.ts"],          // Test file pattern
-  setupFilesAfterEnv: ["<rootDir>/tests/setup.ts"],  // Global setup
-  collectCoverageFrom: [                // Coverage tracking
+  preset: "ts-jest", // TypeScript support
+  testEnvironment: "node", // Node.js environment (not browser)
+  roots: ["<rootDir>/tests"], // Test directory
+  testMatch: ["**/*.test.ts"], // Test file pattern
+  setupFilesAfterEnv: ["<rootDir>/tests/setup.ts"], // Global setup
+  collectCoverageFrom: [
+    // Coverage tracking
     "src/**/*.ts",
-    "!src/**/*.d.ts"
+    "!src/**/*.d.ts",
   ],
   coverageDirectory: "coverage",
   verbose: true,
-  forceExit: true,                      // Force exit after tests complete
-  clearMocks: true,                     // Clear mocks between tests
+  forceExit: true, // Force exit after tests complete
+  clearMocks: true, // Clear mocks between tests
   resetMocks: true,
   restoreMocks: true,
-  maxWorkers: 1,                        // Serial execution (avoids conflicts)
-  testTimeout: 30000,                   // 30 second timeout
+  maxWorkers: 1, // Serial execution (avoids conflicts)
+  testTimeout: 30000, // 30 second timeout
 };
 
 export default config;
 ```
 
 **Critical settings:**
+
 - `maxWorkers: 1` - Run tests serially to avoid resource conflicts (database, ports)
 - `forceExit: true` - Ensure Jest exits after tests (handles hanging connections)
 - `testTimeout: 30000` - Generous timeout for database setup
@@ -121,6 +126,7 @@ export default config;
 Tests set `NODE_ENV=testing` and override critical environment variables directly in the test environment, rather than relying on `.env` files.
 
 **Example in GitHub Actions:**
+
 ```yaml
 - name: Run tests
   working-directory: ./api
@@ -132,12 +138,14 @@ Tests set `NODE_ENV=testing` and override critical environment variables directl
 ```
 
 **Example in setup.ts:**
+
 ```typescript
 process.env.NODE_ENV = "testing";
 process.env.JWT_SECRET = "test-secret";
 ```
 
 **Why this approach?**
+
 - Tests don't depend on local `.env` files (works in CI)
 - Test values are separate from production values
 - No risk of accidentally using production credentials
@@ -145,6 +153,7 @@ process.env.JWT_SECRET = "test-secret";
 ### Database Strategy: In-Memory SQLite
 
 **Why in-memory?**
+
 - Fast: No disk I/O
 - Isolated: Each test run gets fresh database
 - No cleanup needed: Database disappears when tests end
@@ -160,13 +169,13 @@ import { initModels } from "@your-package/db";
 // Create in-memory SQLite instance
 export const sequelize = new Sequelize({
   dialect: "sqlite",
-  storage: ":memory:",  // ← Key: in-memory storage
-  logging: false,       // Silent during tests
+  storage: ":memory:", // ← Key: in-memory storage
+  logging: false, // Silent during tests
 });
 
 beforeAll(async () => {
   initModels();
-  await sequelize.sync({ force: true });  // Create tables
+  await sequelize.sync({ force: true }); // Create tables
 });
 
 beforeEach(async () => {
@@ -185,6 +194,7 @@ afterAll(async () => {
 ```
 
 **Best practices:**
+
 - Use `force: true` in beforeAll to recreate schema
 - Clear data in `beforeEach` for test isolation
 - Reset SQLite sequences for predictable IDs
@@ -195,6 +205,7 @@ afterAll(async () => {
 **Rule: Mock all external dependencies**
 
 External services (email, third-party APIs, file system) should be mocked to:
+
 - Prevent side effects (sending real emails, API calls)
 - Make tests deterministic (no network failures)
 - Speed up tests (no waiting for external services)
@@ -218,7 +229,9 @@ jest.mock("../src/modules/logger", () => ({
 jest.mock("../src/modules/mailer", () => ({
   __esModule: true,
   sendRegistrationEmail: jest.fn(() => Promise.resolve({ response: "250 OK" })),
-  sendResetPasswordEmail: jest.fn(() => Promise.resolve({ response: "250 OK" })),
+  sendResetPasswordEmail: jest.fn(() =>
+    Promise.resolve({ response: "250 OK" }),
+  ),
 }));
 
 // Now import your app (after mocks are defined)
@@ -227,6 +240,7 @@ import app from "../src/app";
 ```
 
 **What to mock:**
+
 - Logger (noisy output)
 - Email service (prevent real emails)
 - File system operations (fs.readFile, fs.writeFile)
@@ -258,7 +272,7 @@ export async function createTestUser(overrides = {}) {
   const token = jwt.sign(
     { id: user.id, email: user.email },
     process.env.JWT_SECRET!,
-    { expiresIn: "1h" }
+    { expiresIn: "1h" },
   );
 
   return { ...user.toJSON(), token };
@@ -282,6 +296,7 @@ export function authHeader(token: string) {
 ```
 
 **Benefits:**
+
 - DRY: Reusable across tests
 - Flexibility: Override default values as needed
 - Consistency: All tests use same data structure
@@ -304,12 +319,10 @@ describe("POST /users/login", () => {
     });
 
     // Act: Make request
-    const response = await request(app)
-      .post("/users/login")
-      .send({
-        email: "login@test.com",
-        password: "password123",
-      });
+    const response = await request(app).post("/users/login").send({
+      email: "login@test.com",
+      password: "password123",
+    });
 
     // Assert: Check response
     expect(response.status).toBe(200);
@@ -320,12 +333,10 @@ describe("POST /users/login", () => {
   it("should return 401 on wrong password", async () => {
     const testUser = await createTestUser();
 
-    const response = await request(app)
-      .post("/users/login")
-      .send({
-        email: testUser.email,
-        password: "wrong-password",
-      });
+    const response = await request(app).post("/users/login").send({
+      email: testUser.email,
+      password: "wrong-password",
+    });
 
     expect(response.status).toBe(401);
   });
@@ -338,6 +349,7 @@ describe("POST /users/login", () => {
 ```
 
 **Best practices:**
+
 - Group related tests with `describe()` blocks
 - Use clear, descriptive test names
 - Follow Arrange-Act-Assert pattern
@@ -355,9 +367,9 @@ name: Run API Tests
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
 
 jobs:
   test:
@@ -365,49 +377,50 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x, 20.x]  # Test on multiple Node versions
+        node-version: [18.x, 20.x] # Test on multiple Node versions
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Setup Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-        cache-dependency-path: api/package-lock.json
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+          cache-dependency-path: api/package-lock.json
 
-    # If monorepo with local packages (e.g., @kybervision/db)
-    - name: Install db-models dependencies
-      working-directory: ./db-models
-      run: npm ci
+      # If monorepo with local packages (e.g., @kybervision/db)
+      - name: Install db-models dependencies
+        working-directory: ./db-models
+        run: npm ci
 
-    - name: Build db-models
-      working-directory: ./db-models
-      run: npm run build
+      - name: Build db-models
+        working-directory: ./db-models
+        run: npm run build
 
-    - name: Install api dependencies
-      working-directory: ./api
-      run: npm ci
+      - name: Install api dependencies
+        working-directory: ./api
+        run: npm ci
 
-    - name: Run tests
-      working-directory: ./api
-      env:
-        NODE_ENV: testing
-        JWT_SECRET: test-secret-for-ci
-        NAME_APP: KyberVision23API-CI
-      run: npm test
+      - name: Run tests
+        working-directory: ./api
+        env:
+          NODE_ENV: testing
+          JWT_SECRET: test-secret-for-ci
+          NAME_APP: KyberVision23API-CI
+        run: npm test
 
-    - name: Upload coverage reports
-      if: matrix.node-version == '20.x'
-      uses: codecov/codecov-action@v3
-      with:
-        directory: ./api/coverage
-        fail_ci_if_error: false
+      - name: Upload coverage reports
+        if: matrix.node-version == '20.x'
+        uses: codecov/codecov-action@v3
+        with:
+          directory: ./api/coverage
+          fail_ci_if_error: false
 ```
 
 **Key features:**
+
 - Runs on multiple Node versions (ensure compatibility)
 - Uses `npm ci` (faster, more reliable than `npm install`)
 - Sets environment variables for tests
@@ -415,6 +428,7 @@ jobs:
 - Runs on Ubuntu (matches production environment)
 
 **Viewing results:**
+
 - Go to repository → Actions tab
 - See ✅ green checkmark (passed) or ❌ red X (failed) on commits
 - Click on run to see detailed logs
@@ -422,6 +436,7 @@ jobs:
 ### Serial vs Parallel Execution
 
 **Problem:** Multiple test files running in parallel can cause conflicts:
+
 - Database port already in use
 - Race conditions in shared resources
 - Unpredictable test failures
@@ -431,12 +446,13 @@ jobs:
 ```typescript
 // jest.config.ts
 const config: Config = {
-  maxWorkers: 1,  // Run one test file at a time
+  maxWorkers: 1, // Run one test file at a time
   // ...
 };
 ```
 
 **Trade-offs:**
+
 - ✅ Pros: Reliable, no resource conflicts
 - ❌ Cons: Slower (but still fast for most projects)
 
@@ -451,6 +467,7 @@ npm test -- --coverage
 ```
 
 **Coverage output:**
+
 ```
 -----------------------|---------|----------|---------|---------|-------------------
 File                   | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
@@ -462,6 +479,7 @@ All files              |   85.23 |    78.45 |   90.12 |   85.67 |
 ```
 
 **Integrate with CI:**
+
 - Upload coverage to Codecov/Coveralls
 - Set minimum coverage thresholds
 - Block PRs that reduce coverage
@@ -518,21 +536,25 @@ it("should return 400 for missing required fields", async () => {
 ### Troubleshooting
 
 **Tests timeout:**
+
 - Increase `testTimeout` in jest.config.ts
 - Check for unclosed database connections
 - Ensure mocks are properly configured
 
 **Tests fail in CI but pass locally:**
+
 - Environment variable differences
 - Different Node.js versions
 - Missing dependencies (check package-lock.json)
 
 **Database errors:**
+
 - Ensure `beforeEach` clears all data
 - Check foreign key constraints (delete in correct order)
 - Verify `initModels()` is called before `sync()`
 
 **Port conflicts:**
+
 - Use random ports: `app.listen(0)` (OS assigns available port)
 - Or run tests serially (`maxWorkers: 1`)
 
@@ -561,5 +583,3 @@ When adding tests to a new Node.js project:
 ## Future Sections
 
 - **NextJS Tests** - Coming soon
-- **Worker Tests** - Coming soon
-- **Integration Tests** - Coming soon
