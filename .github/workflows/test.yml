@@ -25,7 +25,15 @@ jobs:
         cache: 'npm'
         cache-dependency-path: api/package-lock.json
 
-    - name: Install dependencies
+    - name: Install db-models dependencies
+      working-directory: ./db-models
+      run: npm ci
+
+    - name: Build db-models
+      working-directory: ./db-models
+      run: npm run build
+
+    - name: Install api dependencies
       working-directory: ./api
       run: npm ci
 
