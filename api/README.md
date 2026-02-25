@@ -73,6 +73,8 @@ systemctl restart kybervision23api
 
 ## .env
 
+`api/.env` is loaded at runtime via `path.join(__dirname, "../.env")` — `dist/` has no `.env`. `NODE_ENV` must be `production`; `testing` skips database initialization.
+
 ```bash
 NAME_APP=KyberVision23API
 JWT_SECRET=secret_code

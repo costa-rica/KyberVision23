@@ -20,6 +20,8 @@ Express.js REST API in TypeScript. Entry point is `src/app.ts` (creates and conf
 4. `verifyCheckDirectoryExists()` — creates required `PATH_*` directories from env
 5. `onStartUpCreateEnvUsers()` / `onStartUpCreateLeague()` — seed defaults
 
+**Environment file**: `api/.env` — loaded by `dist/app.js` via `path.join(__dirname, "../.env")`. No `.env` belongs in `dist/`. `NODE_ENV=production` is required; `testing` skips `initializeApp()` entirely, leaving all models uninitialized.
+
 ### Project Structure
 
 ```
