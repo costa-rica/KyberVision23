@@ -63,3 +63,27 @@ upload.single("fieldName")(req, res, (err) => {
 ### Middleware Ordering Issue
 
 The `express.json({ limit: "6gb" })` and `express.urlencoded({ limit: "6gb" })` calls in `app.ts` are registered **after** the route mounts and are therefore dead code. Effective body-size configuration must be placed in the initial middleware block (before routes).
+
+## Testing
+
+**Quick reference:**
+```bash
+npm test                        # Run all tests
+npm test -- users.test.ts       # Run specific test file
+npm test -- --watch             # Watch mode
+npm test -- --coverage          # With coverage
+```
+
+**Test details:**
+- Location: `tests/` directory
+- Framework: Jest + Supertest
+- Database: In-memory SQLite
+- Coverage: 68/96 tests (71%)
+- Configuration: `jest.config.ts`
+
+**Key points:**
+- Tests run serially (`maxWorkers: 1`) to avoid resource conflicts
+- Use helper functions from `tests/helpers.ts` for test data
+- CI/CD runs automatically via GitHub Actions on push/PR
+
+See `README.md` and `docs/TEST_IMPLEMENTATION_TODO.md` for detailed test documentation.
